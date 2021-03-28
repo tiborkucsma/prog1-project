@@ -1,0 +1,128 @@
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Random;
+
+public class GameMap {
+    private final Tile[][] map;
+    public final int COLUMNS;
+    public final int ROWS;
+
+    public GameMap(Player[] players)
+    {
+        ROWS = (int) Math.ceil(Math.sqrt(6 * players.length));
+        COLUMNS = 2 * ROWS;
+        map = new Tile[COLUMNS][ROWS];
+        for (int x = 0; x < COLUMNS; x++)
+            for (int y = 0; y < ROWS; y++)
+                map[x][y] = new Tile(x, y);
+
+        Random rand = new Random();
+        int x = rand.nextInt(COLUMNS - 1), y = rand.nextInt(ROWS - 1);
+        int nonNeutral = 1;
+        map[x][y].neutral = false;
+        while (nonNeutral != players.length * 6) {
+            x = rand.nextInt(COLUMNS - 1);
+            y = rand.nextInt(ROWS - 1);
+            if (noOfNeighbours(x, y) > 0 && map[x][y].neutral) {
+                map[x][y].neutral = false;
+                nonNeutral++;
+            }
+        }
+
+        for (int i = 0; i < players.length; i++) {
+            int n = 0;
+            while (n < 6) {
+                x = rand.nextInt(COLUMNS - 1);
+                y = rand.nextInt(ROWS - 1);
+                if (!map[x][y].neutral && map[x][y].owner == null) {
+                    map[x][y].owner = players[i];
+                    n++;
+                }
+            }
+
+            n = 3 * 6;
+            while (n > 0) {
+                x = rand.nextInt(COLUMNS - 1);
+                y = rand.nextInt(ROWS - 1);
+                if (map[x][y].owner == players[i] && map[x][y].dices < 8) {
+                    map[x][y].dices++;
+                    n--;
+                }
+            }
+        }
+    }
+
+    public Tile[][] getMap() {
+        return map;
+    }
+
+    public boolean inBounds(int q, int r)
+    {
+        return  r >= 0 &&
+                q >= 0 &&
+                r < ROWS &&
+                q < COLUMNS;
+    }
+
+    public Tile[] getNeighbours(int q, int r)
+    {
+        ArrayList<Tile> res = new ArrayList<Tile>();
+        boolean isOddRow = r % 2 == 1;
+        for (int x = (isOddRow ? 0 : -1); x <= (isOddRow ? 1 : 0); x++)
+        {
+            for (int y = -1; y <= 1; y++)
+            {
+                if (!(x == 0 && y == 0) &&
+                        inBounds(q + x, r + y) &&
+                        !map[q + x][r + y].neutral)
+                {
+                    res.add(map[q + x][r + y]);
+                }
+            }
+        }
+        if (isOddRow && inBounds(q - 1, r) && !map[q-1][r].neutral) res.add(map[q - 1][r]);
+        else if (!isOddRow && inBounds(q + 1, r) && !map[q+1][r].neutral) res.add(map[q + 1][r]);
+        Tile[] arr = new Tile[res.size()];
+        arr = res.toArray(arr);
+        return arr;
+    }
+
+    public int noOfNeighbours(int q, int r)
+    {
+        int n = 0;
+        boolean isOddRow = r % 2 == 1;
+        for (int x = (isOddRow ? 0 : -1); x <= (isOddRow ? 1 : 0); x++)
+        {
+            for (int y = -1; y <= 1; y++)
+            {
+                if (!(x == 0 && y == 0) &&
+                    inBounds(q + x, r + y) &&
+                    !map[q + x][r + y].neutral)
+                {
+                    n++;
+                }
+            }
+        }
+        if (isOddRow && inBounds(q - 1, r) && !map[q-1][r].neutral) n++;
+        else if (!isOddRow && inBounds(q + 1, r) && !map[q+1][r].neutral) n++;
+        return n;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder res = new StringBuilder();
+        for (int r = 0; r < ROWS; r++)
+        {
+            if (r % 2 == 1) res.append("      ");
+            for (int q = 0; q < COLUMNS; q++)
+            {
+                if (map[q][r].neutral)
+                    res.append("(").append(q).append(",").append(r).append(",-)     ");
+                else
+                    res.append("(").append(q).append(",").append(r).append(",").append(noOfNeighbours(q, r)).append(")     ");
+            }
+            res.append(System.lineSeparator());
+        }
+        return res.toString();
+    }
+}
