@@ -7,8 +7,7 @@ public class GameMap {
     public final int COLUMNS;
     public final int ROWS;
 
-    public GameMap(Player[] players)
-    {
+    public GameMap(Player[] players) {
         ROWS = (int) Math.ceil(Math.sqrt(6 * players.length));
         COLUMNS = 2 * ROWS;
         map = new Tile[COLUMNS][ROWS];
@@ -36,11 +35,12 @@ public class GameMap {
                 y = rand.nextInt(ROWS - 1);
                 if (!map[x][y].neutral && map[x][y].owner == null) {
                     map[x][y].owner = players[i];
+                    map[x][y].dices = 1;
                     n++;
                 }
             }
 
-            n = 3 * 6;
+            n = 3 * 6 - 6;
             while (n > 0) {
                 x = rand.nextInt(COLUMNS - 1);
                 y = rand.nextInt(ROWS - 1);
@@ -56,17 +56,33 @@ public class GameMap {
         return map;
     }
 
-    public boolean inBounds(int q, int r)
-    {
+    public boolean inBounds(int q, int r) {
         return  r >= 0 &&
                 q >= 0 &&
                 r < ROWS &&
                 q < COLUMNS;
     }
 
-    public Tile[] getNeighbours(int q, int r)
-    {
-        ArrayList<Tile> res = new ArrayList<Tile>();
+    public Tile getTile(int q, int r) {
+        return inBounds(q, r) ? map[q][r] : null;
+    }
+
+    public static boolean adjacent(Tile t1, Tile t2) {
+        if (Math.abs(t1.X - t2.X) <= 1 && Math.abs(t1.Y - t2.Y) <= 1) {
+            if (t1.Y % 2 == 1)
+                return t1.X <= t2.X || t1.Y == t2.Y; // (t1.X > t2.X) -> (t1.Y == t2.Y) if row is odd
+            else
+                return t1.X >= t2.X || t1.Y == t2.Y; // (t1.x < t2.X) -> (t1.Y == t2.Y) if row is even
+        }
+        return false;
+    }
+
+    public ArrayList<Tile> getNeighbours(Tile t) {
+        return getNeighbours(t.X, t.Y);
+    }
+
+    public ArrayList<Tile> getNeighbours(int q, int r) {
+        ArrayList<Tile> res = new ArrayList<>();
         boolean isOddRow = r % 2 == 1;
         for (int x = (isOddRow ? 0 : -1); x <= (isOddRow ? 1 : 0); x++)
         {
@@ -82,13 +98,10 @@ public class GameMap {
         }
         if (isOddRow && inBounds(q - 1, r) && !map[q-1][r].neutral) res.add(map[q - 1][r]);
         else if (!isOddRow && inBounds(q + 1, r) && !map[q+1][r].neutral) res.add(map[q + 1][r]);
-        Tile[] arr = new Tile[res.size()];
-        arr = res.toArray(arr);
-        return arr;
+        return res;
     }
 
-    public int noOfNeighbours(int q, int r)
-    {
+    public int noOfNeighbours(int q, int r) {
         int n = 0;
         boolean isOddRow = r % 2 == 1;
         for (int x = (isOddRow ? 0 : -1); x <= (isOddRow ? 1 : 0); x++)
