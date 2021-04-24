@@ -1,6 +1,6 @@
-package map;
+package dicewars.map;
 
-import player.Player;
+import dicewars.player.Player;
 
 import java.util.ArrayList;
 import java.util.Random;

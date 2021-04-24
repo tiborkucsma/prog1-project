@@ -1,14 +1,19 @@
-package state;
+package dicewars.state;
 
-import map.GameMap;
-import map.Tile;
-import player.AIPlayer;
-import player.HumanPlayer;
-import player.Player;
-import rendering.Hexagon;
-import rendering.RenderablePolygon;
-import rendering.RenderableText;
-import rendering.Renderer;
+import dicewars.DiceWars;
+import dicewars.map.GameMap;
+import dicewars.map.Tile;
+import dicewars.player.AIPlayer;
+import dicewars.player.HumanPlayer;
+import dicewars.player.Player;
+import dicewars.player.PlayerAction;
+import dicewars.rendering.Hexagon;
+import dicewars.rendering.RenderablePolygon;
+import dicewars.rendering.RenderableText;
+import dicewars.rendering.Renderer;
+import dicewars.ui.DialogBox;
+import dicewars.ui.GUI;
+import dicewars.ui.PushButton;
 
 import javax.swing.*;
 import java.awt.*;
@@ -24,6 +29,7 @@ import java.util.Timer;
 
 public class InGameState extends GameState implements MouseListener {
     private final Renderer renderer;
+    private final GUI gui;
     private GameMap gameMap;
     private ArrayList<Player> players;
     private Player currentPlayer;
@@ -33,19 +39,26 @@ public class InGameState extends GameState implements MouseListener {
     private long lastAITick = 0;
     private static final Font ARIAL_FONT = new Font("Arial", Font.PLAIN, 20);
     private String statusText = "";
+    private boolean paused = false;
+    private boolean aiOnly;
 
-    public InGameState(Renderer r) {
+    public InGameState(Renderer r, boolean aiOnly) {
         this.renderer = r;
+        this.gui = new GUI(this.renderer);
+        this.aiOnly = aiOnly;
     }
 
     @Override
     public void startup() {
         this.renderer.addMouseListener(this);
+        this.gui.startup();
+        paused = false;
     }
 
     @Override
     public void shutdown() {
         this.renderer.removeMouseListener(this);
+        this.gui.shutdown();
     }
 
     public void setPlayers(Player[] players) {
@@ -80,15 +93,35 @@ public class InGameState extends GameState implements MouseListener {
             }
             if (tilesOfPlayer.get(r).dices == 8) tilesOfPlayer.remove(r);
         }
-        currentPlayer.clearStatus();
-        int playersAlive = 0;
+        int playersAlive = 0, humanPlayersAlive = 0;
         for (Player p : players) {
             if (gameMap.getTiles(p).size() != 0) {
                 playersAlive++;
+                if (p instanceof HumanPlayer) humanPlayersAlive++;
             }
         }
+        if (!aiOnly && humanPlayersAlive == 0) {
+            aiOnly = true;
+            paused = true;
+            gui.addDialogBox(new DialogBox("No human players left alive.", new Point(0, 0),
+                new PushButton("Watch AI players finish...", new Point(0, 0)){
+                    @Override
+                    public void onClick() {
+                        paused = false;
+                    }
+                },
+                new PushButton("End game.", new Point(0, 0)){
+                    @Override
+                    public void onClick() {
+                        DiceWars.endGame();
+                    }
+                })
+            );
+        }
         if (playersAlive > 1) {
-            currentPlayer = getNextPlayer();
+            do {
+                currentPlayer = getNextPlayer();
+            } while(gameMap.getTiles(currentPlayer).size() == 0);
             System.out.println("Next player (" + currentPlayer + ")");
         }
     }
@@ -102,31 +135,36 @@ public class InGameState extends GameState implements MouseListener {
 
     @Override
     public void update() {
-        long currentTime = System.nanoTime();
-        Tile[][] map = gameMap.getMap();
-        this.cursorPos = MouseInfo.getPointerInfo().getLocation();
-        this.cursorPos.translate(-renderer.getLocationOnScreen().x, -renderer.getLocationOnScreen().y);
-        hoveredTile = null;
-        for (int y = 0; y < gameMap.ROWS; y++) {
-            for (int x = 0; x < gameMap.COLUMNS; x++) {
-                if (!map[x][y].neutral) {
-                    int screenX = 50 + x * 87 + (y % 2 == 1 ? 43 : 0);
-                    int screenY = 50 + y * 76;
-                    Hexagon h = new Hexagon(screenX, screenY, 50);
-                    if (h.contains(cursorPos)) {
-                        hoveredTile = map[x][y];
+        if (!this.paused) {
+            long currentTime = System.nanoTime();
+            Tile[][] map = gameMap.getMap();
+            this.cursorPos = MouseInfo.getPointerInfo().getLocation();
+            this.cursorPos.translate(-renderer.getLocationOnScreen().x, -renderer.getLocationOnScreen().y);
+            hoveredTile = null;
+            for (int y = 0; y < gameMap.ROWS; y++) {
+                for (int x = 0; x < gameMap.COLUMNS; x++) {
+                    if (!map[x][y].neutral) {
+                        int screenX = 50 + x * 87 + (y % 2 == 1 ? 43 : 0);
+                        int screenY = 50 + y * 76;
+                        Hexagon h = new Hexagon(screenX, screenY, 50);
+                        if (h.contains(cursorPos)) {
+                            hoveredTile = map[x][y];
+                        }
                     }
                 }
             }
-        }
-        if (currentPlayer instanceof AIPlayer && currentTime - lastAITick > 1000000) {
-            lastAITick = currentTime;
-            if (((AIPlayer) currentPlayer).tick(gameMap) == -1) {
-                endTurn();
+            if (currentPlayer instanceof AIPlayer && currentTime - lastAITick > 100000000) {
+                lastAITick = currentTime;
+                PlayerAction pAction = ((AIPlayer) currentPlayer).tick(gameMap);
+                if (pAction.isEndTurn()) {
+                    endTurn();
+                } else {
+                    pAction.execute();
+                    this.statusText = pAction.toString();
+                }
             }
         }
-        String res = currentPlayer.getStatus();
-        if (res != null) this.statusText = res;
+        gui.update();
     }
 
     private void renderMap() {
@@ -227,22 +265,8 @@ public class InGameState extends GameState implements MouseListener {
         renderMap();
         renderPlayerList();
         renderer.addToQueue(new RenderableText(statusText, 0, renderer.getHeight() - 10, ARIAL_FONT, Color.BLACK));
+        gui.render();
     }
-
-    /*@Override
-    public void actionPerformed(ActionEvent actionEvent) {
-        if (actionEvent.getSource() == timer) {
-            update();
-            render();
-
-            renderer.revalidate();
-            renderer.repaint();
-        } else if (actionEvent.getSource() == aiTimer && currentPlayer instanceof AIPlayer) {
-            if (((AIPlayer) currentPlayer).tick(gameMap) == -1) {
-                endTurn();
-            }
-        }
-    }*/
 
     @Override
     public void mouseClicked(MouseEvent mouseEvent) {
@@ -252,13 +276,19 @@ public class InGameState extends GameState implements MouseListener {
                 endTurn();
             } else if (selectedTile != null) {
                 if (hoveredTile != null) {
-                    currentPlayer.attack(selectedTile, hoveredTile);
+                    PlayerAction a = new PlayerAction(selectedTile, hoveredTile, false);
+                    a.execute();
+                    this.statusText = a.toString();
                 }
                 selectedTile = null;
             } else if (hoveredTile != null && hoveredTile.owner == currentPlayer) {
                 selectedTile = hoveredTile;
             }
         }
+    }
+
+    public void setAiOnly(boolean aiOnly) {
+        this.aiOnly = aiOnly;
     }
 
     @Override

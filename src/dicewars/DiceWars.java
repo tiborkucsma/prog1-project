@@ -1,16 +1,16 @@
-package game;
+package dicewars;
 
-import player.AIPlayer;
-import player.HumanPlayer;
-import player.Player;
-import rendering.Renderer;
-import state.GameCreationState;
-import state.GameState;
-import state.InGameState;
+import dicewars.player.AIPlayer;
+import dicewars.player.HumanPlayer;
+import dicewars.player.Player;
+import dicewars.rendering.Renderer;
+import dicewars.state.GameCreationState;
+import dicewars.state.GameState;
+import dicewars.state.InGameState;
 
 import javax.swing.*;
 
-import map.GameMap;
+import dicewars.map.GameMap;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -20,7 +20,7 @@ public class DiceWars {
     private static final Renderer renderer = new Renderer();
     private static Timer timer;
     private static final GameCreationState GAME_CREATION_STATE = new GameCreationState(renderer);
-    private static final InGameState IN_GAME_STATE = new InGameState(renderer);
+    private static final InGameState IN_GAME_STATE = new InGameState(renderer, false);
     static GameState currentState;
 
     public static void main(String[] args) {
@@ -51,8 +51,21 @@ public class DiceWars {
 
     public static void startNewGame(Player[] players) {
         IN_GAME_STATE.setPlayers(players);
+        boolean aiOnly = true;
+        for (Player p : players) {
+            if (p instanceof HumanPlayer)
+            {
+                aiOnly = false;
+                break;
+            }
+        }
+        IN_GAME_STATE.setAiOnly(aiOnly);
         IN_GAME_STATE.setMap(new GameMap(players));
         switchState(IN_GAME_STATE);
+    }
+
+    public static void endGame() {
+        switchState(GAME_CREATION_STATE);
     }
 
     public static void switchState(GameState newState) {

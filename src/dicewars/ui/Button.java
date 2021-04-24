@@ -1,8 +1,8 @@
-package ui;
+package dicewars.ui;
 
-import rendering.RenderablePolygon;
-import rendering.RenderableText;
-import rendering.Renderer;
+import dicewars.rendering.RenderablePolygon;
+import dicewars.rendering.RenderableText;
+import dicewars.rendering.Renderer;
 
 import java.awt.*;
 import java.awt.Font;

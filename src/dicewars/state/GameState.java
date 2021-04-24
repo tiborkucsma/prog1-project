@@ -1,6 +1,6 @@
-package state;
+package dicewars.state;
 
-import rendering.Renderer;
+import dicewars.rendering.Renderer;
 
 public abstract class GameState {
     public abstract void startup();

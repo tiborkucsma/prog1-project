@@ -1,6 +1,6 @@
-package player;
+package dicewars.player;
 
-import player.Player;
+import dicewars.player.Player;
 
 import java.awt.*;
 

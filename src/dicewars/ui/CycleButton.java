@@ -1,8 +1,8 @@
-package ui;
+package dicewars.ui;
 
-import rendering.RenderablePolygon;
-import rendering.RenderableText;
-import rendering.Renderer;
+import dicewars.rendering.RenderablePolygon;
+import dicewars.rendering.RenderableText;
+import dicewars.rendering.Renderer;
 
 import java.awt.*;
 import java.awt.Font;
@@ -12,25 +12,38 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.security.Policy;
 
-public abstract class PushButton extends Button {
-    public String str;
+public class CycleButton extends Button {
+    private String[] options;
+    private int selected;
     private Polygon shape;
     private Point position;
     private boolean hovered;
     private static final Font ARIAL_FONT = new Font("Arial", Font.PLAIN, 18);
 
-    public PushButton(String str, Point position) {
-        this.str = str;
+    public CycleButton(String[] options, Point position) {
+        super();
+        this.options = options;
         this.position = position;
         FontRenderContext frc = new FontRenderContext(new AffineTransform(), true, true);
-        int width = (int) Math.round(ARIAL_FONT.getStringBounds(str, frc).getWidth());
-        int height = (int) Math.round(ARIAL_FONT.getStringBounds(str, frc).getHeight());
+        
+        int width = 0;
+        int height = 0;
+        for (String str : options) {
+            int currWidth = (int) Math.round(ARIAL_FONT.getStringBounds(str, frc).getWidth());
+            int currHeight = (int) Math.round(ARIAL_FONT.getStringBounds(str, frc).getHeight());
+            if (currWidth > width) {
+                width = currWidth;
+                height = currHeight;
+            }
+        }
+
         int[] xpoints = { 0, width + 12, width + 12, 0 };
         int[] ypoints = { 0, 0, height, height };
         shape = new Polygon(xpoints, ypoints, 4);
         shape.translate(position.x, position.y);
     }
 
+    @Override
     protected void render(Renderer renderer) {
         Point p = renderer.getMousePosition();
         if (p != null && shape.contains(p)) {
@@ -40,14 +53,24 @@ public abstract class PushButton extends Button {
             renderer.addToQueue(new RenderablePolygon(shape, Color.LIGHT_GRAY));
             hovered = false;
         }
-        renderer.addToQueue(new RenderableText(str, position.x + 6, position.y + 16, ARIAL_FONT, Color.BLACK));
+        renderer.addToQueue(new RenderableText(options[selected], position.x + 6, position.y + 16, ARIAL_FONT, Color.BLACK));
+    }
+
+    public int getSelectedIndex() {
+        return selected;
+    }
+
+    public String getSelectedVal() {
+        return options[selected];
     }
 
     public boolean isHovered() {
         return this.hovered;
     }
 
-    public abstract void onClick();
+    public void onClick() {
+        selected = (selected + 1) % options.length;
+    }
 
     public Polygon getShape() {
         return this.shape;

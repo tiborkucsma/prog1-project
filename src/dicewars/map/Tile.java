@@ -1,6 +1,6 @@
-package map;
+package dicewars.map;
 
-import player.Player;
+import dicewars.player.Player;
 
 public class Tile {
     public Player owner = null;

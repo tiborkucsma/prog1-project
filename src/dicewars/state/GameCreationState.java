@@ -1,15 +1,15 @@
-package state;
+package dicewars.state;
 
-import map.GameMap;
-import map.Tile;
-import player.AIPlayer;
-import player.HumanPlayer;
-import player.Player;
-import rendering.Renderer;
-import ui.Button;
-import ui.CycleButton;
-import ui.GUI;
-import ui.PushButton;
+import dicewars.map.GameMap;
+import dicewars.map.Tile;
+import dicewars.player.AIPlayer;
+import dicewars.player.HumanPlayer;
+import dicewars.player.Player;
+import dicewars.rendering.Renderer;
+import dicewars.ui.Button;
+import dicewars.ui.CycleButton;
+import dicewars.ui.GUI;
+import dicewars.ui.PushButton;
 
 import javax.swing.*;
 import java.awt.*;
@@ -40,7 +40,7 @@ public class GameCreationState extends GameState {
                 }
                 Player[] arr = new Player[players.size()];
                 arr = players.toArray(arr);
-                game.DiceWars.startNewGame(arr);
+                dicewars.DiceWars.startNewGame(arr);
             }
         });
         this.playerSelection = new CycleButton[5];

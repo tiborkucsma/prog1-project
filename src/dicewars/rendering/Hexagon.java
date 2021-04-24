@@ -1,4 +1,4 @@
-package rendering;
+package dicewars.rendering;
 
 import java.awt.*;
 

@@ -1,20 +1,23 @@
-package ui;
+package dicewars.ui;
 
 import java.util.ArrayList;
+import java.util.List;
 
-import rendering.Renderer;
+import dicewars.rendering.Renderer;
 
 import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 public class GUI implements MouseListener {
-    private final ArrayList<Button> buttons;
+    private final List<Button> buttons;
+    private final List<DialogBox> dialogBoxes;
     private final Renderer renderer;
 
     public GUI(Renderer renderer) {
         this.renderer = renderer;
         this.buttons = new ArrayList<>();
+        this.dialogBoxes = new ArrayList<>();
     }
 
     public void startup() {
@@ -33,6 +36,9 @@ public class GUI implements MouseListener {
         for (Button b : buttons) {
             b.render(this.renderer);
         }
+        for (DialogBox b : dialogBoxes) {
+            b.render(this.renderer);
+        }
     }
 
     public Button addButton(Button b) {
@@ -40,12 +46,28 @@ public class GUI implements MouseListener {
         return b;
     }
 
+    public DialogBox addDialogBox(DialogBox box) {
+        dialogBoxes.add(box);
+        return box;
+    }
+
     @Override
     public void mouseClicked(MouseEvent arg0) {
-        for (Button b : buttons) {
-            if (b.isHovered()) {
-                b.onClick();
-                break;
+        if (dialogBoxes.isEmpty()) {
+            for (Button b : buttons) {
+                if (b.isHovered()) {
+                    b.onClick();
+                    break;
+                }
+            }
+        } else {
+            DialogBox b = dialogBoxes.get(dialogBoxes.size() - 1);
+            if (b.op0.isHovered()) {
+                dialogBoxes.remove(b);
+                b.op0.onClick();
+            } else if (b.op1.isHovered()) {
+                dialogBoxes.remove(b);
+                b.op1.onClick();
             }
         }
     }
