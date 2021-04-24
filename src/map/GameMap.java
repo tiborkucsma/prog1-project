@@ -1,5 +1,8 @@
+package map;
+
+import player.Player;
+
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Random;
 
 public class GameMap {
@@ -8,7 +11,8 @@ public class GameMap {
     public final int ROWS;
 
     public GameMap(Player[] players) {
-        ROWS = (int) Math.ceil(Math.sqrt(6 * players.length));
+        int tilePerPlayer = 20;
+        ROWS = (int) Math.ceil(Math.sqrt(((tilePerPlayer + 6) / 2) * players.length));
         COLUMNS = 2 * ROWS;
         map = new Tile[COLUMNS][ROWS];
         for (int x = 0; x < COLUMNS; x++)
@@ -19,7 +23,7 @@ public class GameMap {
         int x = rand.nextInt(COLUMNS - 1), y = rand.nextInt(ROWS - 1);
         int nonNeutral = 1;
         map[x][y].neutral = false;
-        while (nonNeutral != players.length * 6) {
+        while (nonNeutral != players.length * tilePerPlayer) {
             x = rand.nextInt(COLUMNS - 1);
             y = rand.nextInt(ROWS - 1);
             if (noOfNeighbours(x, y) > 0 && map[x][y].neutral) {
@@ -30,7 +34,7 @@ public class GameMap {
 
         for (int i = 0; i < players.length; i++) {
             int n = 0;
-            while (n < 6) {
+            while (n < tilePerPlayer) {
                 x = rand.nextInt(COLUMNS - 1);
                 y = rand.nextInt(ROWS - 1);
                 if (!map[x][y].neutral && map[x][y].owner == null) {
@@ -40,7 +44,7 @@ public class GameMap {
                 }
             }
 
-            n = 3 * 6 - 6;
+            n = 3 * tilePerPlayer - tilePerPlayer;
             while (n > 0) {
                 x = rand.nextInt(COLUMNS - 1);
                 y = rand.nextInt(ROWS - 1);
@@ -65,6 +69,18 @@ public class GameMap {
 
     public Tile getTile(int q, int r) {
         return inBounds(q, r) ? map[q][r] : null;
+    }
+
+    public ArrayList<Tile> getTiles(Player owner) {
+        ArrayList<Tile> res = new ArrayList<>();
+        for (int x = 0; x < COLUMNS; x++) {
+            for (int y = 0; y < ROWS; y++) {
+                if (map[x][y].owner == owner) {
+                    res.add(map[x][y]);
+                }
+            }
+        }
+        return res;
     }
 
     public static boolean adjacent(Tile t1, Tile t2) {

@@ -1,3 +1,5 @@
+package rendering;
+
 import java.awt.*;
 
 public class Hexagon extends Polygon {
