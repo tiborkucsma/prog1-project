@@ -3,10 +3,12 @@ package dicewars;
 import dicewars.player.AIPlayer;
 import dicewars.player.HumanPlayer;
 import dicewars.player.Player;
+import dicewars.player.PlayerAction;
 import dicewars.rendering.Renderer;
 import dicewars.state.GameCreationState;
 import dicewars.state.GameState;
 import dicewars.state.InGameState;
+import dicewars.state.ReplayGameState;
 
 import javax.swing.*;
 
@@ -15,12 +17,19 @@ import dicewars.map.GameMap;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class DiceWars {
     private static final Renderer renderer = new Renderer();
     private static Timer timer;
     private static final GameCreationState GAME_CREATION_STATE = new GameCreationState(renderer);
     private static final InGameState IN_GAME_STATE = new InGameState(renderer, false);
+    private static final ReplayGameState REPLAY_GAME_STATE = new ReplayGameState(renderer);
     static GameState currentState;
 
     public static void main(String[] args) {
@@ -31,7 +40,20 @@ public class DiceWars {
 
         frame.add(renderer);
 
-        switchState(GAME_CREATION_STATE);
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("test.out"))) {
+            GameSave gs = null;
+            gs = (GameSave) ois.readObject();
+            REPLAY_GAME_STATE.setGameSave(gs);
+            switchState(REPLAY_GAME_STATE);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        // switchState(GAME_CREATION_STATE);
 
         timer = new Timer(10, new ActionListener() {
             @Override

@@ -1,11 +1,12 @@
 package dicewars.player;
 
+import java.io.Serializable;
 import java.util.Random;
 
 import dicewars.map.GameMap;
 import dicewars.map.Tile;
 
-public class PlayerAction {
+public class PlayerAction implements Serializable {
     private Tile attacker;
     private Tile target;
     private boolean valid;
@@ -19,39 +20,60 @@ public class PlayerAction {
             target == null ||
             attacker.owner == target.owner ||
             !GameMap.adjacent(attacker, target) ||
-            attacker.dices < 2) valid = false;
-        else valid = true;
+            attacker.dices < 2) {
+            
+            valid = false;
+        } else {
+            valid = true;
+            Random rand = new Random();
+            int i;
+            for (i = 0; i < attacker.dices; i++) {
+                int val = rand.nextInt(5) + 1;
+                this.ownThrow[i] = val;
+            }
+            this.ownThrow[i] = -1;
+            for (i = 0; i < target.dices; i++) {
+                int val = rand.nextInt(5) + 1;
+                this.opponentThrow[i] = val;
+            }
+            this.opponentThrow[i] = -1;
+        }
         this.attacker = attacker;
         this.target = target;
         this.endTurn = endTurn;
     }
 
+    public PlayerAction(Tile attacker, Tile target, boolean endTurn, int[] ownThrow, int[] opponentThrow) {
+        this.attacker = attacker;
+        this.target = target;
+        this.valid = true;
+        this.endTurn = endTurn;
+        this.executed = false;
+        for (int i = 0; i < 9; i++) this.ownThrow[i] = ownThrow[i];
+        for (int i = 0; i < 9; i++) this.opponentThrow[i] = opponentThrow[i];
+    }
+
     public void execute() {
-        if (!this.executed) {
-            this.executed = true;
-            if (this.valid) {
-                Random rand = new Random();
-                int ownThrow = 0, opponentThrow = 0;
-                int i;
-                for (i = 0; i < attacker.dices; i++) {
-                    int val = rand.nextInt(5) + 1;
-                    ownThrow += val;
-                    this.ownThrow[i] = val;
-                }
-                this.ownThrow[i] = -1;
-                for (i = 0; i < target.dices; i++) {
-                    int val = rand.nextInt(5) + 1;
-                    opponentThrow += val;
-                    this.opponentThrow[i] = val;
-                }
-                this.opponentThrow[i] = -1;
-                if (ownThrow > opponentThrow) {
-                    target.owner = attacker.owner;
-                    target.dices = attacker.dices - 1;
-                }
-                attacker.dices = 1;
+        this.executed = true;
+        if (this.valid) {
+            int ownThrowSum = 0, opponentThrowSum = 0;
+            for (int i : this.ownThrow) {
+                ownThrowSum += i;
             }
+            for (int i : this.opponentThrow) {
+                opponentThrowSum += i;
+            }
+            if (ownThrowSum > opponentThrowSum) {
+                target.owner = attacker.owner;
+                target.dices = attacker.dices - 1;
+            }
+            attacker.dices = 1;
         }
+    }
+
+    public boolean isActionOf(Player p) {
+        if (this.attacker.owner == p) return true;
+        return false;
     }
 
     public Tile getAttacker() {
@@ -72,6 +94,14 @@ public class PlayerAction {
 
     public boolean isExecuted() {
         return executed;
+    }
+
+    public int[] getOwnThrow() {
+        return ownThrow;
+    }
+
+    public int[] getOpponentThrow() {
+        return opponentThrow;
     }
 
     @Override

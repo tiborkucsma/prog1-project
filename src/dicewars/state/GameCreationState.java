@@ -17,7 +17,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 
-public class GameCreationState extends GameState {
+public class GameCreationState implements GameState {
     private final Renderer renderer;
     private final Color[] playerColors = { Color.CYAN, Color.YELLOW, Color.ORANGE, Color.RED, Color.MAGENTA };
     private static final Font ARIAL_FONT = new Font("Arial", Font.PLAIN, 20);

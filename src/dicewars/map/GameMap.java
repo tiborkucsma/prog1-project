@@ -2,10 +2,11 @@ package dicewars.map;
 
 import dicewars.player.Player;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class GameMap {
+public class GameMap implements Serializable {
     private final Tile[][] map;
     public final int COLUMNS;
     public final int ROWS;
@@ -54,6 +55,15 @@ public class GameMap {
                 }
             }
         }
+    }
+
+    public GameMap(GameMap gameMap) {
+        this.COLUMNS = gameMap.COLUMNS;
+        this.ROWS = gameMap.ROWS;
+        this.map = new Tile[this.COLUMNS][this.ROWS];
+        for (int x = 0; x < COLUMNS; x++)
+            for (int y = 0; y < ROWS; y++)
+                this.map[x][y] = new Tile(gameMap.map[x][y]);
     }
 
     public Tile[][] getMap() {

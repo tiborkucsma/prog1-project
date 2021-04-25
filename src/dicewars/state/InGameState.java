@@ -1,6 +1,7 @@
 package dicewars.state;
 
 import dicewars.DiceWars;
+import dicewars.GameSave;
 import dicewars.map.GameMap;
 import dicewars.map.Tile;
 import dicewars.player.AIPlayer;
@@ -15,23 +16,24 @@ import dicewars.ui.DialogBox;
 import dicewars.ui.GUI;
 import dicewars.ui.PushButton;
 
-import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.time.LocalDateTime;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
-import java.util.Timer;
 
-public class InGameState extends GameState implements MouseListener {
-    private final Renderer renderer;
+public class InGameState implements GameState, MouseListener {
+    final Renderer renderer;
     private final GUI gui;
     private GameMap gameMap;
-    private ArrayList<Player> players;
+    private List<Player> players;
     private Player currentPlayer;
     private Point cursorPos = new Point(0, 0);
     private Tile hoveredTile = null;
@@ -41,6 +43,7 @@ public class InGameState extends GameState implements MouseListener {
     private String statusText = "";
     private boolean paused = false;
     private boolean aiOnly;
+    private GameSave gs;
 
     public InGameState(Renderer r, boolean aiOnly) {
         this.renderer = r;
@@ -53,6 +56,7 @@ public class InGameState extends GameState implements MouseListener {
         this.renderer.addMouseListener(this);
         this.gui.startup();
         paused = false;
+        gs = new GameSave(players, gameMap);
     }
 
     @Override
@@ -123,6 +127,33 @@ public class InGameState extends GameState implements MouseListener {
                 currentPlayer = getNextPlayer();
             } while(gameMap.getTiles(currentPlayer).size() == 0);
             System.out.println("Next player (" + currentPlayer + ")");
+        } else {
+            paused = true;
+            gui.addDialogBox(new DialogBox("Would you like to save a replay?", new Point(0, 0),
+                new PushButton("Save replay", new Point(0, 0)){
+                    @Override
+                    public void onClick() {
+                        try {
+                            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("test.out"));
+                            oos.writeObject(gs);
+                            oos.close();
+                        } catch (FileNotFoundException e) {
+                            System.err.println("Failed to save replay!");
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            System.err.println("Failed to save replay!");
+                            e.printStackTrace();
+                        }
+                        DiceWars.endGame();
+                    }
+                },
+                new PushButton("Back to menu", new Point(0, 0)){
+                    @Override
+                    public void onClick() {
+                        DiceWars.endGame();
+                    }
+                })
+            );
         }
     }
 
@@ -153,9 +184,10 @@ public class InGameState extends GameState implements MouseListener {
                     }
                 }
             }
-            if (currentPlayer instanceof AIPlayer && currentTime - lastAITick > 100000000) {
+            if (currentPlayer instanceof AIPlayer && currentTime - lastAITick > 10000000) {
                 lastAITick = currentTime;
                 PlayerAction pAction = ((AIPlayer) currentPlayer).tick(gameMap);
+                gs.addPlayerAction(pAction);
                 if (pAction.isEndTurn()) {
                     endTurn();
                 } else {
@@ -228,19 +260,6 @@ public class InGameState extends GameState implements MouseListener {
         if (h.contains(cursorPos)) {
             hoveredTile = new Tile(-2, -2);
         }
-
-        /* For testing adjacency method
-        if (hoveredTile != null) {
-            for (int y = 0; y < gameMap.ROWS; y++) {
-                for (int x = 0; x < gameMap.COLUMNS; x++) {
-                    if (!map[x][y].neutral && map.GameMap.adjacent(hoveredTile, map[x][y])) {
-                        int screenX = 50 + x * 87 + (y % 2 == 1 ? 43 : 0);
-                        int screenY = 50 + y * 76;
-                        renderer.addToQueue(new RenderablePolygon(new rendering.Hexagon(screenX, screenY, 50), Color.GREEN));
-                    }
-                }
-            }
-        }*/
     }
 
     private void renderPlayerList() {
@@ -277,6 +296,7 @@ public class InGameState extends GameState implements MouseListener {
             } else if (selectedTile != null) {
                 if (hoveredTile != null) {
                     PlayerAction a = new PlayerAction(selectedTile, hoveredTile, false);
+                    gs.addPlayerAction(a);
                     a.execute();
                     this.statusText = a.toString();
                 }
