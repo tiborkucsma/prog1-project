@@ -1,5 +1,7 @@
 package dicewars.state;
 
+import dicewars.DiceWars;
+import dicewars.GameSave;
 import dicewars.map.GameMap;
 import dicewars.map.Tile;
 import dicewars.player.AIPlayer;
@@ -15,6 +17,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
 
 public class GameCreationState implements GameState {
@@ -41,6 +48,43 @@ public class GameCreationState implements GameState {
                 Player[] arr = new Player[players.size()];
                 arr = players.toArray(arr);
                 dicewars.DiceWars.startNewGame(arr);
+            }
+        });
+        gui.addButton(new PushButton("Play replay file", new Point(150, 0)) {
+            @Override
+            public void onClick() {
+                JFileChooser fc = new JFileChooser();
+                fc.setCurrentDirectory(new File(System.getProperty("user.dir")));
+                int option = fc.showOpenDialog(null);
+                if (option == JFileChooser.APPROVE_OPTION) {
+                    File file = fc.getSelectedFile();
+                    try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
+                        GameSave gs = null;
+                        gs = (GameSave) ois.readObject();
+                        DiceWars.startReplay(gs);
+                    } catch (FileNotFoundException e) {
+                        JDialog dialog = new JDialog();
+                        dialog.setTitle("Error");
+                        JLabel l = new JLabel("Failed to load replay file, file not found!");
+                        dialog.add(l);
+                        dialog.setSize(400, 200);
+                        dialog.setVisible(true);
+                    } catch (IOException e) {
+                        JDialog dialog = new JDialog();
+                        dialog.setTitle("Error");
+                        JLabel l = new JLabel("Failed to load replay file, IO exception!");
+                        dialog.add(l);
+                        dialog.setSize(400, 200);
+                        dialog.setVisible(true);
+                    } catch (ClassNotFoundException e) {
+                        JDialog dialog = new JDialog();
+                        dialog.setTitle("Error");
+                        JLabel l = new JLabel("Failed to load replay file, class not found!");
+                        dialog.add(l);
+                        dialog.setSize(400, 200);
+                        dialog.setVisible(true);
+                    }
+                }
             }
         });
         this.playerSelection = new CycleButton[5];

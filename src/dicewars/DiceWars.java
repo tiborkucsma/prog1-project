@@ -40,20 +40,7 @@ public class DiceWars {
 
         frame.add(renderer);
 
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("test.out"))) {
-            GameSave gs = null;
-            gs = (GameSave) ois.readObject();
-            REPLAY_GAME_STATE.setGameSave(gs);
-            switchState(REPLAY_GAME_STATE);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        // switchState(GAME_CREATION_STATE);
+        switchState(GAME_CREATION_STATE);
 
         timer = new Timer(10, new ActionListener() {
             @Override
@@ -88,6 +75,11 @@ public class DiceWars {
 
     public static void endGame() {
         switchState(GAME_CREATION_STATE);
+    }
+
+    public static void startReplay(GameSave gs) {
+        REPLAY_GAME_STATE.setGameSave(gs);
+        switchState(REPLAY_GAME_STATE);
     }
 
     public static void switchState(GameState newState) {

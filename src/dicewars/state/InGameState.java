@@ -19,6 +19,7 @@ import dicewars.ui.PushButton;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -28,6 +29,8 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
+
+import javax.swing.JFileChooser;
 
 public class InGameState implements GameState, MouseListener {
     final Renderer renderer;
@@ -133,16 +136,20 @@ public class InGameState implements GameState, MouseListener {
                 new PushButton("Save replay", new Point(0, 0)){
                     @Override
                     public void onClick() {
-                        try {
-                            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("test.out"));
-                            oos.writeObject(gs);
-                            oos.close();
-                        } catch (FileNotFoundException e) {
-                            System.err.println("Failed to save replay!");
-                            e.printStackTrace();
-                        } catch (IOException e) {
-                            System.err.println("Failed to save replay!");
-                            e.printStackTrace();
+                        JFileChooser fc = new JFileChooser();
+                        fc.setCurrentDirectory(new File(System.getProperty("user.dir")));
+                        int option = fc.showSaveDialog(null);
+                        if (option == JFileChooser.APPROVE_OPTION) {
+                            File file = fc.getSelectedFile();
+                            try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
+                                oos.writeObject(gs);
+                            } catch (FileNotFoundException e) {
+                                System.err.println("Failed to save replay!");
+                                e.printStackTrace();
+                            } catch (IOException e) {
+                                System.err.println("Failed to save replay!");
+                                e.printStackTrace();
+                            }
                         }
                         DiceWars.endGame();
                     }

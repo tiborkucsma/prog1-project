@@ -98,9 +98,6 @@ public class ReplayGameState implements GameState {
                 if (currentAction < gs.actionHistory.size()) {
                     PlayerAction action = gs.actionHistory.get(currentAction++);
                     if (!action.isEndTurn() && !action.isActionOf(currentPlayer)) {
-                        System.out.println(currentPlayer);
-                        System.out.println(action.getAttacker().owner);
-                        System.out.println(action.getTarget().owner);
                         System.err.println("Wrong replay file! Action was not performed by this player.");
                         DiceWars.endGame();
                     }
