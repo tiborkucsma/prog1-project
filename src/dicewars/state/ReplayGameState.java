@@ -220,7 +220,7 @@ public class ReplayGameState implements GameState {
                     if (h.contains(cursorPos))
                         renderer.addToQueue(new RenderablePolygon(h, Color.GREEN));
                     for (Player p: gs.players) {
-                        if (p == map[x][y].owner) {
+                        if (p == map[x][y].getOwner()) {
                             renderer.addToQueue(new RenderablePolygon(new Hexagon(screenX, screenY, 45), p.color));
                             break;
                         }
@@ -238,7 +238,7 @@ public class ReplayGameState implements GameState {
                 if (!map[x][y].neutral) {
                     int screenX = 25 + x * 87 + (y % 2 == 1 ? 43 : 0);
                     int screenY = 50 + y * 76;
-                    renderer.addToQueue(new RenderableText("K: " + map[x][y].dices, screenX, screenY, ARIAL_FONT, Color.BLACK));
+                    renderer.addToQueue(new RenderableText("K: " + map[x][y].getDices(), screenX, screenY, ARIAL_FONT, Color.BLACK));
                 }
             }
         }

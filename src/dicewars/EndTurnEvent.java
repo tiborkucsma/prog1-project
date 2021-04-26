@@ -25,7 +25,7 @@ public class EndTurnEvent extends GameEvent {
 
     public void execute() {
         for (Map.Entry<Tile, Integer> entry : addedDices.entrySet()) {
-            entry.getKey().dices += entry.getValue();
+            entry.getKey().setDices(entry.getKey().getDices() + entry.getValue());
         }
     }
 

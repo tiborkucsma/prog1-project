@@ -18,21 +18,21 @@ public class PlayerAction extends GameEvent {
     public PlayerAction(Tile attacker, Tile target, boolean endTurn) {
         if (attacker == null ||
             target == null ||
-            attacker.owner == target.owner ||
+            attacker.getOwner() == target.getOwner() ||
             !GameMap.adjacent(attacker, target) ||
-            attacker.dices < 2) {
+            attacker.getDices() < 2) {
             
             valid = false;
         } else {
             valid = true;
             Random rand = new Random();
             int i;
-            for (i = 0; i < attacker.dices; i++) {
+            for (i = 0; i < attacker.getDices(); i++) {
                 int val = rand.nextInt(5) + 1;
                 this.ownThrow[i] = val;
             }
             this.ownThrow[i] = -1;
-            for (i = 0; i < target.dices; i++) {
+            for (i = 0; i < target.getDices(); i++) {
                 int val = rand.nextInt(5) + 1;
                 this.opponentThrow[i] = val;
             }
@@ -64,15 +64,15 @@ public class PlayerAction extends GameEvent {
                 opponentThrowSum += i;
             }
             if (ownThrowSum > opponentThrowSum) {
-                target.owner = attacker.owner;
-                target.dices = attacker.dices - 1;
+                target.setOwner(attacker.getOwner());
+                target.setDices(attacker.getDices() - 1);
             }
-            attacker.dices = 1;
+            attacker.setDices(1);
         }
     }
 
     public boolean isActionOf(Player p) {
-        if (this.attacker.owner == p) return true;
+        if (this.attacker.getOwner() == p) return true;
         return false;
     }
 

@@ -19,13 +19,13 @@ public class AIPlayerMedium extends AIPlayer {
     public PlayerAction tick(GameMap gameMap) {
         for (int x = 0; x < gameMap.COLUMNS; x++) {
             for (int y = 0; y < gameMap.ROWS; y++) {
-                if (gameMap.getTile(x, y).owner == this) {
+                if (gameMap.getTile(x, y).getOwner() == this) {
                     Tile cOwn = gameMap.getTile(x, y);
                     ArrayList<Tile> neighbours = gameMap.getNeighbours(cOwn);
                     Tile best_option = null;
                     for (Tile t : neighbours) {
-                        if (t.owner != this && (t.dices < cOwn.dices || cOwn.dices == 8)) {
-                            if (best_option == null || best_option.dices < t.dices) {
+                        if (t.getOwner() != this && (t.getDices() < cOwn.getDices() || cOwn.getDices() == 8)) {
+                            if (best_option == null || best_option.getDices() < t.getDices()) {
                                 best_option = t;
                             }
                         }

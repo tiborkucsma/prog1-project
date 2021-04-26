@@ -11,6 +11,7 @@ import dicewars.state.ReplayGameState;
 import javax.swing.*;
 
 import dicewars.map.GameMap;
+import dicewars.map.Tile;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

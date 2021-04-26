@@ -116,12 +116,12 @@ public class InGameState implements GameState, MouseListener {
         EndTurnEvent ete = new EndTurnEvent();
         while (k > 0 && tilesOfPlayer.size() > 0) {
             int r = rand.nextInt(tilesOfPlayer.size());
-            if (tilesOfPlayer.get(r).dices < 8) {
+            if (tilesOfPlayer.get(r).getDices() < 8) {
                 ete.addDices(tilesOfPlayer.get(r), 1);
-                tilesOfPlayer.get(r).dices++;
+                tilesOfPlayer.get(r).incDices();
                 k--;
             }
-            if (tilesOfPlayer.get(r).dices == 8) tilesOfPlayer.remove(r);
+            if (tilesOfPlayer.get(r).getDices() == 8) tilesOfPlayer.remove(r);
         }
         gs.addEndTurnEvent(ete);
         int playersAlive = 0, humanPlayersAlive = 0;
@@ -240,7 +240,7 @@ public class InGameState implements GameState, MouseListener {
             renderer.addToQueue(new RenderablePolygon(new Hexagon(screenX, screenY, 50), Color.GREEN));
             ArrayList<Tile> neighbours = gameMap.getNeighbours(selectedTile.X, selectedTile.Y);
             for (Tile t : neighbours) {
-                if (t.owner != map[selectedTile.X][selectedTile.Y].owner) {
+                if (t.getOwner() != map[selectedTile.X][selectedTile.Y].getOwner()) {
                     int screenNX = 50 + t.X * 87 + (t.Y % 2 == 1 ? 43 : 0);
                     int screenNY = 50 + t.Y * 76;
                     renderer.addToQueue(new RenderablePolygon(new Hexagon(screenNX, screenNY, 50), Color.DARK_GRAY));
@@ -257,7 +257,7 @@ public class InGameState implements GameState, MouseListener {
                     if (h.contains(cursorPos))
                         renderer.addToQueue(new RenderablePolygon(h, Color.GREEN));
                     for (Player p: players) {
-                        if (p == map[x][y].owner) {
+                        if (p == map[x][y].getOwner()) {
                             renderer.addToQueue(new RenderablePolygon(new Hexagon(screenX, screenY, 45), p.color));
                             break;
                         }
@@ -275,7 +275,7 @@ public class InGameState implements GameState, MouseListener {
                 if (!map[x][y].neutral) {
                     int screenX = 25 + x * 87 + (y % 2 == 1 ? 43 : 0);
                     int screenY = 50 + y * 76;
-                    renderer.addToQueue(new RenderableText("K: " + map[x][y].dices, screenX, screenY, ARIAL_FONT, Color.BLACK));
+                    renderer.addToQueue(new RenderableText("K: " + map[x][y].getDices(), screenX, screenY, ARIAL_FONT, Color.BLACK));
                 }
             }
         }
@@ -334,7 +334,7 @@ public class InGameState implements GameState, MouseListener {
                         this.statusText = a.toString();
                     }
                     selectedTile = null;
-                } else if (hoveredTile != null && hoveredTile.owner == currentPlayer) {
+                } else if (hoveredTile != null && hoveredTile.getOwner() == currentPlayer) {
                     selectedTile = hoveredTile;
                 }
             }

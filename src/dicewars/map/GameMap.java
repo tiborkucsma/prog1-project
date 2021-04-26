@@ -38,9 +38,9 @@ public class GameMap implements Serializable {
             while (n < tilePerPlayer) {
                 x = rand.nextInt(COLUMNS - 1);
                 y = rand.nextInt(ROWS - 1);
-                if (!map[x][y].neutral && map[x][y].owner == null) {
-                    map[x][y].owner = players[i];
-                    map[x][y].dices = 1;
+                if (!map[x][y].neutral && map[x][y].getOwner() == null) {
+                    map[x][y].setOwner(players[i]);
+                    map[x][y].setDices(1);
                     n++;
                 }
             }
@@ -49,8 +49,7 @@ public class GameMap implements Serializable {
             while (n > 0) {
                 x = rand.nextInt(COLUMNS - 1);
                 y = rand.nextInt(ROWS - 1);
-                if (map[x][y].owner == players[i] && map[x][y].dices < 8) {
-                    map[x][y].dices++;
+                if (map[x][y].getOwner() == players[i] && map[x][y].incDices() == 1) {
                     n--;
                 }
             }
@@ -85,7 +84,7 @@ public class GameMap implements Serializable {
         ArrayList<Tile> res = new ArrayList<>();
         for (int x = 0; x < COLUMNS; x++) {
             for (int y = 0; y < ROWS; y++) {
-                if (map[x][y].owner == owner) {
+                if (map[x][y].getOwner() == owner) {
                     res.add(map[x][y]);
                 }
             }

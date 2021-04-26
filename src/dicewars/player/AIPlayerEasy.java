@@ -18,10 +18,10 @@ public class AIPlayerEasy extends AIPlayer {
     public PlayerAction tick(GameMap gameMap) {
         for (int x = 0; x < gameMap.COLUMNS; x++) {
             for (int y = 0; y < gameMap.ROWS; y++) {
-                if (gameMap.getTile(x, y).owner == this) {
+                if (gameMap.getTile(x, y).getOwner() == this) {
                     ArrayList<Tile> neighbours = gameMap.getNeighbours(gameMap.getTile(x, y));
                     for (Tile t : neighbours) {
-                        if (t.owner != this && (gameMap.getTile(x, y).dices > 1)) {
+                        if (t.getOwner() != this && (gameMap.getTile(x, y).getDices() > 1)) {
                             return new PlayerAction(gameMap.getTile(x, y), t, false);
                         }
                     }
