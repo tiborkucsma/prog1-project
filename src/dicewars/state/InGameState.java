@@ -51,7 +51,7 @@ public class InGameState implements GameState, MouseListener {
     public InGameState(Renderer r, boolean aiOnly) {
         this.renderer = r;
         this.gui = new GUI(this.renderer);
-        gui.addButton(new PushButton("Save replay", new Point(0, 1000)){
+        gui.addButton(new PushButton("Save replay", new Point(0, 800)){
             @Override
             public void onClick() {
                 JFileChooser fc = new JFileChooser();
@@ -215,7 +215,7 @@ public class InGameState implements GameState, MouseListener {
                     }
                 }
             }
-            if (currentPlayer instanceof AIPlayer && currentTime - lastAITick > 1000000000) {
+            if (currentPlayer instanceof AIPlayer && currentTime - lastAITick > 100000000) {
                 lastAITick = currentTime;
                 PlayerAction pAction = ((AIPlayer) currentPlayer).tick(gameMap);
                 gs.addPlayerAction(pAction);

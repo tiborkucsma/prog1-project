@@ -3,6 +3,9 @@ package dicewars.state;
 import dicewars.DiceWars;
 import dicewars.GameSave;
 import dicewars.player.AIPlayer;
+import dicewars.player.AIPlayerEasy;
+import dicewars.player.AIPlayerHard;
+import dicewars.player.AIPlayerMedium;
 import dicewars.player.HumanPlayer;
 import dicewars.player.Player;
 import dicewars.rendering.Renderer;
@@ -33,10 +36,12 @@ public class GameCreationState implements GameState {
             public void onClick() {
                 ArrayList<Player> players = new ArrayList<>();
                 for (int i = 0; i < playerSelection.length; i++) {
-                    if (playerSelection[i].getSelectedIndex() == 1) {
-                        players.add(new HumanPlayer(playerColors[i]));
-                    } else if (playerSelection[i].getSelectedIndex() == 2) {
-                        players.add(new AIPlayer(playerColors[i]));
+                    switch (playerSelection[i].getSelectedIndex()) {
+                        case 1: players.add(new HumanPlayer(playerColors[i])); break;
+                        case 2: players.add(new AIPlayerEasy(playerColors[i])); break;
+                        case 3: players.add(new AIPlayerMedium(playerColors[i])); break;
+                        case 4: players.add(new AIPlayerHard(playerColors[i])); break;
+                        default:
                     }
                 }
                 Player[] arr = new Player[players.size()];
@@ -83,7 +88,7 @@ public class GameCreationState implements GameState {
         });
         this.playerSelection = new CycleButton[5];
         for (int i = 0; i < 5; i++) {
-            String[] opts = { "Nincs", "Ember", "AI" };
+            String[] opts = { "None", "Human", "AI Easy", "AI Medium", "AI Hard" };
             this.playerSelection[i] = (CycleButton) gui.addButton(new CycleButton(opts, new Point(0, 50 + i * 25)));
         }
     }

@@ -16,6 +16,9 @@ import dicewars.ui.PushButton;
 import dicewars.GameEvent;
 
 import java.awt.*;
+import javax.swing.Timer;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class ReplayGameState implements GameState {
     private final Renderer renderer;
@@ -25,12 +28,55 @@ public class ReplayGameState implements GameState {
     private static final Font ARIAL_FONT = new Font("Arial", Font.PLAIN, 20);
     private String statusText = "";
     private boolean paused = false;
+    private Timer timer;
     private GameSave gs;
     private int currentAction = 0;
 
     public ReplayGameState(Renderer r) {
         this.renderer = r;
         this.gui = new GUI(this.renderer);
+        timer = new Timer(10, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                if (currentAction < gs.actionHistory.size()) {
+                    GameEvent event = gs.actionHistory.get(currentAction++);
+                    
+                    if (event instanceof PlayerAction) {
+                        PlayerAction action = (PlayerAction) event;
+                        if (!action.isEndTurn() && !action.isActionOf(currentPlayer)) {
+                            System.err.println("Wrong replay file! Action was not performed by this player.");
+                            DiceWars.endGame();
+                        }
+                        if (action.isEndTurn()) {
+                            endTurn();
+                        } else {
+                            action.execute();
+                            System.out.println(currentAction + ": " + event);
+                        }
+                    } else if (event instanceof EndTurnEvent) {
+                        EndTurnEvent ete = (EndTurnEvent) event;
+                        ete.execute();
+                        System.out.println(currentAction + ": " + event);
+                    }
+                } else {
+                    paused = true;
+                    gui.addDialogBox(new DialogBox("Replay file over.", new Point(0, 750),
+                        new PushButton("Back to menu", new Point(0, 0)){
+                            @Override
+                            public void onClick() {
+                                DiceWars.endGame();
+                            }
+                        },
+                        new PushButton("Back to menu", new Point(0, 0)){
+                            @Override
+                            public void onClick() {
+                                DiceWars.endGame();
+                            }
+                        })
+                    );
+                }
+            }
+        });
         gui.addButton(new PushButton("Step", new Point(0, 1000)){
             @Override
             public void onClick() {
@@ -79,11 +125,13 @@ public class ReplayGameState implements GameState {
     public void startup() {
         this.gui.startup();
         paused = false;
+        timer.start();
     }
 
     @Override
     public void shutdown() {
         this.gui.shutdown();
+        timer.stop();
     }
 
     public void setGameSave(GameSave gs) {
