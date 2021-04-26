@@ -1,7 +1,7 @@
 package dicewars.state;
 
 import dicewars.DiceWars;
-import dicewars.EndTurnEvent;
+import dicewars.DiceDistribution;
 import dicewars.GameSave;
 import dicewars.map.Tile;
 import dicewars.player.Player;
@@ -53,8 +53,8 @@ public class ReplayGameState implements GameState {
                             action.execute();
                             System.out.println(currentAction + ": " + event);
                         }
-                    } else if (event instanceof EndTurnEvent) {
-                        EndTurnEvent ete = (EndTurnEvent) event;
+                    } else if (event instanceof DiceDistribution) {
+                        DiceDistribution ete = (DiceDistribution) event;
                         ete.execute();
                         System.out.println(currentAction + ": " + event);
                     }
@@ -95,8 +95,8 @@ public class ReplayGameState implements GameState {
                             action.execute();
                             System.out.println(currentAction + ": " + event);
                         }
-                    } else if (event instanceof EndTurnEvent) {
-                        EndTurnEvent ete = (EndTurnEvent) event;
+                    } else if (event instanceof DiceDistribution) {
+                        DiceDistribution ete = (DiceDistribution) event;
                         ete.execute();
                         System.out.println(currentAction + ": " + event);
                     }

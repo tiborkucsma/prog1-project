@@ -1,7 +1,7 @@
 package dicewars.state;
 
 import dicewars.DiceWars;
-import dicewars.EndTurnEvent;
+import dicewars.DiceDistribution;
 import dicewars.GameSave;
 import dicewars.map.GameMap;
 import dicewars.map.Tile;
@@ -111,19 +111,9 @@ public class InGameState implements GameState, MouseListener {
 
     private void endTurn() {
         ArrayList<Tile> tilesOfPlayer = gameMap.getTiles(currentPlayer);
-        Random rand = new Random();
         int k = tilesOfPlayer.size() / 2;
-        EndTurnEvent ete = new EndTurnEvent();
-        while (k > 0 && tilesOfPlayer.size() > 0) {
-            int r = rand.nextInt(tilesOfPlayer.size());
-            if (tilesOfPlayer.get(r).getDices() < 8) {
-                ete.addDices(tilesOfPlayer.get(r), 1);
-                tilesOfPlayer.get(r).incDices();
-                k--;
-            }
-            if (tilesOfPlayer.get(r).getDices() == 8) tilesOfPlayer.remove(r);
-        }
-        gs.addEndTurnEvent(ete);
+        DiceDistribution dd = gameMap.distributeDices(tilesOfPlayer, k);
+        gs.addEndTurnEvent(dd);
         int playersAlive = 0, humanPlayersAlive = 0;
         for (Player p : players) {
             if (gameMap.getTiles(p).size() != 0) {

@@ -6,15 +6,15 @@ import java.util.Map;
 import dicewars.map.GameMap;
 import dicewars.map.Tile;
 
-public class EndTurnEvent extends GameEvent {
+public class DiceDistribution extends GameEvent {
     private Map<Tile, Integer> addedDices;
 
-    public EndTurnEvent() {
+    public DiceDistribution() {
         addedDices = new HashMap<>();
     }
 
-    public EndTurnEvent translateToMap(GameMap map) {
-        EndTurnEvent tEvent = new EndTurnEvent();
+    public DiceDistribution translateToMap(GameMap map) {
+        DiceDistribution tEvent = new DiceDistribution();
         for (Map.Entry<Tile, Integer> entry : addedDices.entrySet()) {
             Tile tTile = map.getTile(entry.getKey().X, entry.getKey().Y);
             if (tTile == null) return null;

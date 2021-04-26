@@ -1,9 +1,11 @@
 package dicewars.map;
 
+import dicewars.DiceDistribution;
 import dicewars.player.Player;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class GameMap implements Serializable {
@@ -46,13 +48,7 @@ public class GameMap implements Serializable {
             }
 
             n = 3 * tilePerPlayer - tilePerPlayer;
-            while (n > 0) {
-                x = rand.nextInt(COLUMNS - 1);
-                y = rand.nextInt(ROWS - 1);
-                if (map[x][y].getOwner() == players[i] && map[x][y].incDices() == 1) {
-                    n--;
-                }
-            }
+            distributeDices(getTiles(players[i]), n);
         }
     }
 
@@ -63,6 +59,35 @@ public class GameMap implements Serializable {
         for (int x = 0; x < COLUMNS; x++)
             for (int y = 0; y < ROWS; y++)
                 this.map[x][y] = new Tile(gameMap.map[x][y]);
+    }
+
+    public int countDices(List<Tile> tiles) {
+        if (tiles == null) return 0;
+        int res = 0;
+        for (Tile tile : tiles) {
+            res += tile.getDices();
+        }
+        return res;
+    }
+
+    /**
+     * Distributes n dices randomly between the given tiles.
+     * @param tiles Tiles to distribute the dices between
+     * @param n Number of dices to distribute
+     */
+    public DiceDistribution distributeDices(List<Tile> tiles, int n) {
+        if (tiles.size() == 0) return null;
+        DiceDistribution dd = new DiceDistribution();
+        Random rand = new Random();
+        while (n > 0) {
+            int i = rand.nextInt(tiles.size());
+            if (tiles.get(i).incDices() == 1) {
+                dd.addDices(tiles.get(i), 1);
+                n--;
+            }
+            if (countDices(tiles) == tiles.size() * 8) break; // stop the loop if all the tiles are full
+        }
+        return dd;
     }
 
     public Tile[][] getMap() {

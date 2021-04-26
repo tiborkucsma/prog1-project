@@ -33,7 +33,7 @@ public class GameSave implements Serializable {
             pa.getOpponentThrow()));
     }
 
-    public void addEndTurnEvent(EndTurnEvent e) {
+    public void addEndTurnEvent(DiceDistribution e) {
         actionHistory.add(e.translateToMap(map));
     }
 }
