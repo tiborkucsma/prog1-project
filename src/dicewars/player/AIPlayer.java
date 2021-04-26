@@ -2,7 +2,6 @@ package dicewars.player;
 
 import dicewars.map.GameMap;
 import dicewars.map.Tile;
-import dicewars.player.Player;
 
 import java.awt.*;
 import java.util.ArrayList;

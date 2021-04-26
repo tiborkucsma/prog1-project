@@ -8,9 +8,6 @@ import java.awt.*;
 import java.awt.Font;
 import java.awt.font.FontRenderContext;
 import java.awt.geom.AffineTransform;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.security.Policy;
 
 public class CycleButton extends Button {
     private String[] options;

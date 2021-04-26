@@ -1,16 +1,11 @@
 package dicewars.ui;
 
-import java.awt.Graphics;
-
-import dicewars.rendering.Renderable;
 import dicewars.rendering.RenderablePolygon;
 import dicewars.rendering.RenderableText;
 import dicewars.rendering.Renderer;
 
 import java.awt.*;
 import java.awt.Font;
-import java.awt.font.FontRenderContext;
-import java.awt.geom.AffineTransform;
 
 public class DialogBox {
     private Point position;

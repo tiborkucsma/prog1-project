@@ -5,7 +5,6 @@ import java.util.List;
 
 import dicewars.rendering.Renderer;
 
-import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 

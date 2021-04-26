@@ -1,12 +1,12 @@
 package dicewars.player;
 
-import java.io.Serializable;
 import java.util.Random;
 
+import dicewars.GameEvent;
 import dicewars.map.GameMap;
 import dicewars.map.Tile;
 
-public class PlayerAction implements Serializable {
+public class PlayerAction extends GameEvent {
     private Tile attacker;
     private Tile target;
     private boolean valid;
@@ -43,10 +43,10 @@ public class PlayerAction implements Serializable {
         this.endTurn = endTurn;
     }
 
-    public PlayerAction(Tile attacker, Tile target, boolean endTurn, int[] ownThrow, int[] opponentThrow) {
+    public PlayerAction(Tile attacker, Tile target, boolean valid, boolean endTurn, int[] ownThrow, int[] opponentThrow) {
         this.attacker = attacker;
         this.target = target;
-        this.valid = true;
+        this.valid = valid;
         this.endTurn = endTurn;
         this.executed = false;
         for (int i = 0; i < 9; i++) this.ownThrow[i] = ownThrow[i];
@@ -109,14 +109,20 @@ public class PlayerAction implements Serializable {
         if (this.valid && this.executed) {
             StringBuilder sb = new StringBuilder();
             sb.append("Own throw:");
+            int sum = 0;
             for (int i = 0; i < 9 && ownThrow[i] != -1; i++) {
                 sb.append(" " + ownThrow[i]);
+                sum += ownThrow[i];
             }
+            sb.append(" ("+sum+")");
 
             sb.append(" Opponent throw:");
+            sum = 0;
             for (int i = 0; i < 9 && opponentThrow[i] != -1; i++) {
                 sb.append(" " + opponentThrow[i]);
+                sum += opponentThrow[i];
             }
+            sb.append(" ("+sum+")");
 
             return sb.toString();
         } else if (this.valid) {

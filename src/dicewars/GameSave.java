@@ -12,7 +12,7 @@ import dicewars.player.PlayerAction;
 public class GameSave implements Serializable {
     public List<Player> players;
     public GameMap map;
-    public List<PlayerAction> actionHistory;
+    public List<GameEvent> actionHistory;
 
     public GameSave(List<Player> players, GameMap map) {
         this.players = new ArrayList<>();
@@ -27,8 +27,13 @@ public class GameSave implements Serializable {
         actionHistory.add(new PlayerAction(
             attacker == null ? null : map.getTile(attacker.X, attacker.Y),
             target == null ? null : map.getTile(target.X, target.Y),
+            pa.isValid(),
             pa.isEndTurn(),
             pa.getOwnThrow(),
             pa.getOpponentThrow()));
+    }
+
+    public void addEndTurnEvent(EndTurnEvent e) {
+        actionHistory.add(e.translateToMap(map));
     }
 }

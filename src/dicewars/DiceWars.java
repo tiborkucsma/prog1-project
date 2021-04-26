@@ -1,9 +1,7 @@
 package dicewars;
 
-import dicewars.player.AIPlayer;
 import dicewars.player.HumanPlayer;
 import dicewars.player.Player;
-import dicewars.player.PlayerAction;
 import dicewars.rendering.Renderer;
 import dicewars.state.GameCreationState;
 import dicewars.state.GameState;
@@ -14,15 +12,8 @@ import javax.swing.*;
 
 import dicewars.map.GameMap;
 
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 public class DiceWars {
     private static final Renderer renderer = new Renderer();

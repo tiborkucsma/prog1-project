@@ -2,21 +2,16 @@ package dicewars.state;
 
 import dicewars.DiceWars;
 import dicewars.GameSave;
-import dicewars.map.GameMap;
-import dicewars.map.Tile;
 import dicewars.player.AIPlayer;
 import dicewars.player.HumanPlayer;
 import dicewars.player.Player;
 import dicewars.rendering.Renderer;
-import dicewars.ui.Button;
 import dicewars.ui.CycleButton;
 import dicewars.ui.GUI;
 import dicewars.ui.PushButton;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -27,7 +22,6 @@ import java.util.ArrayList;
 public class GameCreationState implements GameState {
     private final Renderer renderer;
     private final Color[] playerColors = { Color.CYAN, Color.YELLOW, Color.ORANGE, Color.RED, Color.MAGENTA };
-    private static final Font ARIAL_FONT = new Font("Arial", Font.PLAIN, 20);
     private final GUI gui;
     private final CycleButton[] playerSelection;
 

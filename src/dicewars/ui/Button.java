@@ -1,16 +1,8 @@
 package dicewars.ui;
 
-import dicewars.rendering.RenderablePolygon;
-import dicewars.rendering.RenderableText;
 import dicewars.rendering.Renderer;
 
 import java.awt.*;
-import java.awt.Font;
-import java.awt.font.FontRenderContext;
-import java.awt.geom.AffineTransform;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.security.Policy;
 
 public abstract class Button {
     private Polygon shape;

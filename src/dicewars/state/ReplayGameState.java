@@ -1,11 +1,9 @@
 package dicewars.state;
 
 import dicewars.DiceWars;
+import dicewars.EndTurnEvent;
 import dicewars.GameSave;
-import dicewars.map.GameMap;
 import dicewars.map.Tile;
-import dicewars.player.AIPlayer;
-import dicewars.player.HumanPlayer;
 import dicewars.player.Player;
 import dicewars.player.PlayerAction;
 import dicewars.rendering.Hexagon;
@@ -15,19 +13,15 @@ import dicewars.rendering.Renderer;
 import dicewars.ui.DialogBox;
 import dicewars.ui.GUI;
 import dicewars.ui.PushButton;
+import dicewars.GameEvent;
 
 import java.awt.*;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Random;
 
 public class ReplayGameState implements GameState {
     private final Renderer renderer;
     private final GUI gui;
     private Player currentPlayer;
     private Point cursorPos = new Point(0, 0);
-    private long lastTick = 0;
     private static final Font ARIAL_FONT = new Font("Arial", Font.PLAIN, 20);
     private String statusText = "";
     private boolean paused = false;
@@ -37,6 +31,48 @@ public class ReplayGameState implements GameState {
     public ReplayGameState(Renderer r) {
         this.renderer = r;
         this.gui = new GUI(this.renderer);
+        gui.addButton(new PushButton("Step", new Point(0, 1000)){
+            @Override
+            public void onClick() {
+                if (currentAction < gs.actionHistory.size()) {
+                    GameEvent event = gs.actionHistory.get(currentAction++);
+                    
+                    if (event instanceof PlayerAction) {
+                        PlayerAction action = (PlayerAction) event;
+                        if (!action.isEndTurn() && !action.isActionOf(currentPlayer)) {
+                            System.err.println("Wrong replay file! Action was not performed by this player.");
+                            DiceWars.endGame();
+                        }
+                        if (action.isEndTurn()) {
+                            endTurn();
+                        } else {
+                            action.execute();
+                            System.out.println(currentAction + ": " + event);
+                        }
+                    } else if (event instanceof EndTurnEvent) {
+                        EndTurnEvent ete = (EndTurnEvent) event;
+                        ete.execute();
+                        System.out.println(currentAction + ": " + event);
+                    }
+                } else {
+                    paused = true;
+                    gui.addDialogBox(new DialogBox("Replay file over.", new Point(0, 750),
+                        new PushButton("Back to menu", new Point(0, 0)){
+                            @Override
+                            public void onClick() {
+                                DiceWars.endGame();
+                            }
+                        },
+                        new PushButton("Back to menu", new Point(0, 0)){
+                            @Override
+                            public void onClick() {
+                                DiceWars.endGame();
+                            }
+                        })
+                    );
+                }
+            }
+        });
     }
 
     @Override
@@ -57,17 +93,6 @@ public class ReplayGameState implements GameState {
     }
 
     private void endTurn() {
-        ArrayList<Tile> tilesOfPlayer = gs.map.getTiles(currentPlayer);
-        Random rand = new Random();
-        int k = tilesOfPlayer.size() / 2;
-        while (k > 0 && tilesOfPlayer.size() > 0) {
-            int r = rand.nextInt(tilesOfPlayer.size());
-            if (tilesOfPlayer.get(r).dices < 8) {
-                tilesOfPlayer.get(r).dices++;
-                k--;
-            }
-            if (tilesOfPlayer.get(r).dices == 8) tilesOfPlayer.remove(r);
-        }
         int playersAlive = 0;
         for (Player p : gs.players) {
             if (gs.map.getTiles(p).size() != 0) {
@@ -92,23 +117,30 @@ public class ReplayGameState implements GameState {
     @Override
     public void update() {
         if (!this.paused) {
-            long currentTime = System.nanoTime();
-            if (currentTime - lastTick > 10000000) {
+            /*long currentTime = System.nanoTime();
+            if (currentTime - lastTick > 1000000000) {
                 lastTick = currentTime;
                 if (currentAction < gs.actionHistory.size()) {
-                    PlayerAction action = gs.actionHistory.get(currentAction++);
-                    if (!action.isEndTurn() && !action.isActionOf(currentPlayer)) {
-                        System.err.println("Wrong replay file! Action was not performed by this player.");
-                        DiceWars.endGame();
-                    }
-                    if (action.isEndTurn()) {
-                        endTurn();
-                    } else {
-                        action.execute();
+                    GameEvent event = gs.actionHistory.get(currentAction++);
+                    System.out.println(currentAction + ": " + event);
+                    if (event instanceof PlayerAction) {
+                        PlayerAction action = (PlayerAction) event;
+                        if (!action.isEndTurn() && !action.isActionOf(currentPlayer)) {
+                            System.err.println("Wrong replay file! Action was not performed by this player.");
+                            DiceWars.endGame();
+                        }
+                        if (action.isEndTurn()) {
+                            endTurn();
+                        } else {
+                            action.execute();
+                        }
+                    } else if (event instanceof EndTurnEvent) {
+                        EndTurnEvent ete = (EndTurnEvent) event;
+                        ete.execute();
                     }
                 } else {
                     this.paused = true;
-                    gui.addDialogBox(new DialogBox("Replay file over.", new Point(0, 0),
+                    gui.addDialogBox(new DialogBox("Replay file over.", new Point(0, 750),
                         new PushButton("Back to menu", new Point(0, 0)){
                             @Override
                             public void onClick() {
@@ -123,7 +155,7 @@ public class ReplayGameState implements GameState {
                         })
                     );
                 }
-            }
+            }*/
         }
         gui.update();
     }

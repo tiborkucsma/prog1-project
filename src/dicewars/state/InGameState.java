@@ -1,6 +1,7 @@
 package dicewars.state;
 
 import dicewars.DiceWars;
+import dicewars.EndTurnEvent;
 import dicewars.GameSave;
 import dicewars.map.GameMap;
 import dicewars.map.Tile;
@@ -24,7 +25,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,6 +51,27 @@ public class InGameState implements GameState, MouseListener {
     public InGameState(Renderer r, boolean aiOnly) {
         this.renderer = r;
         this.gui = new GUI(this.renderer);
+        gui.addButton(new PushButton("Save replay", new Point(0, 1000)){
+            @Override
+            public void onClick() {
+                JFileChooser fc = new JFileChooser();
+                fc.setCurrentDirectory(new File(System.getProperty("user.dir")));
+                int option = fc.showSaveDialog(null);
+                if (option == JFileChooser.APPROVE_OPTION) {
+                    File file = fc.getSelectedFile();
+                    try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
+                        oos.writeObject(gs);
+                    } catch (FileNotFoundException e) {
+                        System.err.println("Failed to save replay!");
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        System.err.println("Failed to save replay!");
+                        e.printStackTrace();
+                    }
+                }
+                DiceWars.endGame();
+            }
+        });
         this.aiOnly = aiOnly;
     }
 
@@ -92,14 +113,17 @@ public class InGameState implements GameState, MouseListener {
         ArrayList<Tile> tilesOfPlayer = gameMap.getTiles(currentPlayer);
         Random rand = new Random();
         int k = tilesOfPlayer.size() / 2;
+        EndTurnEvent ete = new EndTurnEvent();
         while (k > 0 && tilesOfPlayer.size() > 0) {
             int r = rand.nextInt(tilesOfPlayer.size());
             if (tilesOfPlayer.get(r).dices < 8) {
+                ete.addDices(tilesOfPlayer.get(r), 1);
                 tilesOfPlayer.get(r).dices++;
                 k--;
             }
             if (tilesOfPlayer.get(r).dices == 8) tilesOfPlayer.remove(r);
         }
+        gs.addEndTurnEvent(ete);
         int playersAlive = 0, humanPlayersAlive = 0;
         for (Player p : players) {
             if (gameMap.getTiles(p).size() != 0) {
@@ -191,7 +215,7 @@ public class InGameState implements GameState, MouseListener {
                     }
                 }
             }
-            if (currentPlayer instanceof AIPlayer && currentTime - lastAITick > 10000000) {
+            if (currentPlayer instanceof AIPlayer && currentTime - lastAITick > 1000000000) {
                 lastAITick = currentTime;
                 PlayerAction pAction = ((AIPlayer) currentPlayer).tick(gameMap);
                 gs.addPlayerAction(pAction);
@@ -280,7 +304,7 @@ public class InGameState implements GameState, MouseListener {
             screenX = 30;
             screenY += 7;
             renderer.addToQueue(new RenderableText(
-                    "player.Player " + (i + 1) + ": " + gameMap.getTiles(p).size() + " tiles " + (currentPlayer == p ? "<<" : ""),
+                    "Player " + (i + 1) + ": " + gameMap.getTiles(p).size() + " tiles " + (currentPlayer == p ? "<<" : ""),
                     screenX, screenY, ARIAL_FONT, Color.BLACK));
             screenY += 25;
         }
@@ -296,20 +320,23 @@ public class InGameState implements GameState, MouseListener {
 
     @Override
     public void mouseClicked(MouseEvent mouseEvent) {
-        if (currentPlayer instanceof HumanPlayer) {
-            if (hoveredTile != null && hoveredTile.X == -2 && hoveredTile.Y == -2) {
-                System.out.println("End turn");
-                endTurn();
-            } else if (selectedTile != null) {
-                if (hoveredTile != null) {
-                    PlayerAction a = new PlayerAction(selectedTile, hoveredTile, false);
-                    gs.addPlayerAction(a);
-                    a.execute();
-                    this.statusText = a.toString();
+        if (!this.paused) {
+            if (currentPlayer instanceof HumanPlayer) {
+                if (hoveredTile != null && hoveredTile.X == -2 && hoveredTile.Y == -2) {
+                    gs.addPlayerAction(new PlayerAction(null, null, true));
+                    System.out.println("End turn");
+                    endTurn();
+                } else if (selectedTile != null) {
+                    if (hoveredTile != null) {
+                        PlayerAction a = new PlayerAction(selectedTile, hoveredTile, false);
+                        gs.addPlayerAction(a);
+                        a.execute();
+                        this.statusText = a.toString();
+                    }
+                    selectedTile = null;
+                } else if (hoveredTile != null && hoveredTile.owner == currentPlayer) {
+                    selectedTile = hoveredTile;
                 }
-                selectedTile = null;
-            } else if (hoveredTile != null && hoveredTile.owner == currentPlayer) {
-                selectedTile = hoveredTile;
             }
         }
     }
