@@ -12,10 +12,10 @@ public class AIPlayerHard extends AIPlayer {
         super(color);
     }
 
-    private int countOpponents(List<Tile> ts) {
+    private int countOnes(List<Tile> ts) {
         int n = 0;
         for (Tile t : ts) {
-            if (t.getOwner() != this) n++;
+            if (t.getDices() == 1) n++;
         }
         return n;
     }
@@ -28,11 +28,11 @@ public class AIPlayerHard extends AIPlayer {
         for (Tile cOwn : tiles) {
             List<Tile> neighbours = gameMap.getNeighbours(cOwn);
             for (Tile cOpp : neighbours) {
-                if (cOpp.getOwner() != this && cOwn.getDices() > 1) {
+                if (cOpp.getOwner() != this && cOwn.getDices() > cOpp.getDices()) {
                     double cScore =
-                        (cOwn.getDices() - cOpp.getDices()) +
-                        (cOwn.getDices() == 8 ? 5.0 : 0) +
-                        (6 - countOpponents(gameMap.getNeighbours(cOpp))) / 4.0;
+                        Math.exp(cOwn.getDices() - cOpp.getDices()) +
+                        (cOwn.getDices() == 8 ? 0.5 : 0) +
+                        Math.exp(gameMap.getTiles(cOpp.getOwner()).size() - tiles.size()) / 1.5;
                     if (cScore > bestOptionScore) {
                         bestOptionOwn = cOwn;
                         bestOptionOpp = cOpp;

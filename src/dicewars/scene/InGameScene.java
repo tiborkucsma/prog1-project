@@ -6,13 +6,12 @@ import dicewars.player.AIPlayer;
 import dicewars.player.HumanPlayer;
 import dicewars.player.PlayerAction;
 import dicewars.rendering.GameStateRenderer;
-import dicewars.rendering.RenderableText;
 import dicewars.state.GameState;
 import dicewars.state.GameState.GameMode;
 
 import javax.swing.*;
 
-import java.awt.*;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -26,14 +25,14 @@ import javax.swing.JFileChooser;
 public class InGameScene implements Scene, MouseListener {
     private final JFrame frame;
     private GameStateRenderer gameStateRenderer;
-    private static final Font ARIAL_FONT = new Font("Arial", Font.PLAIN, 20);
     private boolean paused = false;
     private GameState gameState;
     private JButton quitButton = new JButton("Quit to menu");
     private JButton saveReplayButton = new JButton("Save replay");
     private JButton endTurnButton = new JButton("End turn");
     private JPanel panel = new JPanel();
-    private Timer aiTimer = new Timer(50, new ActionListener() {
+    private JSlider speedControl = new JSlider();
+    private Timer aiTimer = new Timer(500, new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent arg0) {
             if (!paused && !(gameState.getCurrentPlayer() instanceof HumanPlayer)) {
@@ -77,9 +76,17 @@ public class InGameScene implements Scene, MouseListener {
                 }
             }
         });
+        this.speedControl.setMaximumSize(new Dimension(200, 0));
+        this.speedControl.setMinimum(0);
+        this.speedControl.setMaximum(990);
+        this.speedControl.setValue(500);
+        this.speedControl.addChangeListener(l -> {
+            aiTimer.setDelay(1000 - ((JSlider) l.getSource()).getValue());
+        });
         this.panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
         this.panel.add(quitButton);
         this.panel.add(saveReplayButton);
+        this.panel.add(speedControl);
         this.panel.add(gameStateRenderer);
         this.panel.add(endTurnButton);
     }
