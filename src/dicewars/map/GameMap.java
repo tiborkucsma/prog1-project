@@ -2,20 +2,32 @@ package dicewars.map;
 
 import dicewars.DiceDistribution;
 import dicewars.player.Player;
+import dicewars.rendering.Hexagon;
+import dicewars.rendering.RenderablePolygon;
+import dicewars.rendering.RenderableText;
+import dicewars.rendering.Renderer;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import javax.swing.JButton;
+
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.Point;
+import java.awt.Color;
+import java.awt.Font;
+
 public class GameMap implements Serializable {
     private final Tile[][] map;
     public final int COLUMNS;
     public final int ROWS;
 
-    public GameMap(Player[] players) {
+    public GameMap(List<Player> players) {
         int tilePerPlayer = 12;
-        ROWS = (int) Math.ceil(Math.sqrt(((tilePerPlayer + 6) / 2) * players.length));
+        ROWS = (int) Math.ceil(Math.sqrt(((tilePerPlayer + 6) / 2) * players.size()));
         COLUMNS = 2 * ROWS;
         map = new Tile[COLUMNS][ROWS];
         for (int x = 0; x < COLUMNS; x++)
@@ -26,7 +38,7 @@ public class GameMap implements Serializable {
         int x = rand.nextInt(COLUMNS - 1), y = rand.nextInt(ROWS - 1);
         int nonNeutral = 1;
         map[x][y].neutral = false;
-        while (nonNeutral != players.length * tilePerPlayer) {
+        while (nonNeutral != players.size() * tilePerPlayer) {
             x = rand.nextInt(COLUMNS - 1);
             y = rand.nextInt(ROWS - 1);
             if (noOfNeighbours(x, y) > 0 && map[x][y].neutral) {
@@ -35,20 +47,20 @@ public class GameMap implements Serializable {
             }
         }
 
-        for (int i = 0; i < players.length; i++) {
+        for (int i = 0; i < players.size(); i++) {
             int n = 0;
             while (n < tilePerPlayer) {
                 x = rand.nextInt(COLUMNS - 1);
                 y = rand.nextInt(ROWS - 1);
                 if (!map[x][y].neutral && map[x][y].getOwner() == null) {
-                    map[x][y].setOwner(players[i]);
+                    map[x][y].setOwner(players.get(i));
                     map[x][y].setDices(1);
                     n++;
                 }
             }
 
             n = 3 * tilePerPlayer - tilePerPlayer;
-            distributeDices(getTiles(players[i]), n);
+            distributeDices(getTiles(players.get(i)), n);
         }
     }
 
@@ -169,6 +181,17 @@ public class GameMap implements Serializable {
         if (isOddRow && inBounds(q - 1, r) && !map[q-1][r].neutral) n++;
         else if (!isOddRow && inBounds(q + 1, r) && !map[q+1][r].neutral) n++;
         return n;
+    }
+
+    public Tile getHoveredTile() {
+        for (int x = 0; x < COLUMNS; x++) {
+            for (int y = 0; y < ROWS; y++) {
+                if (map[x][y].isHovered()) {
+                    return map[x][y];
+                }
+            }
+        }
+        return null;
     }
 
     @Override

@@ -22,15 +22,7 @@ public class GameSave implements Serializable {
     }
 
     public void addPlayerAction(PlayerAction pa) {
-        Tile attacker = pa.getAttacker();
-        Tile target = pa.getTarget();
-        actionHistory.add(new PlayerAction(
-            attacker == null ? null : map.getTile(attacker.X, attacker.Y),
-            target == null ? null : map.getTile(target.X, target.Y),
-            pa.isValid(),
-            pa.isEndTurn(),
-            pa.getOwnThrow(),
-            pa.getOpponentThrow()));
+        actionHistory.add(pa.translateToMap(map));
     }
 
     public void addEndTurnEvent(DiceDistribution e) {

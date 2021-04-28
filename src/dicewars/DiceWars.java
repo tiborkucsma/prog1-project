@@ -3,36 +3,35 @@ package dicewars;
 import dicewars.player.HumanPlayer;
 import dicewars.player.Player;
 import dicewars.rendering.Renderer;
-import dicewars.state.GameCreationState;
+import dicewars.scene.GameCreationScene;
+import dicewars.scene.InGameScene;
+import dicewars.scene.ReplayScene;
+import dicewars.scene.Scene;
 import dicewars.state.GameState;
-import dicewars.state.InGameState;
-import dicewars.state.ReplayGameState;
+import dicewars.state.GameState.GameMode;
 
 import javax.swing.*;
 
 import dicewars.map.GameMap;
-import dicewars.map.Tile;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 public class DiceWars {
-    private static final Renderer renderer = new Renderer();
     private static Timer timer;
-    private static final GameCreationState GAME_CREATION_STATE = new GameCreationState(renderer);
-    private static final InGameState IN_GAME_STATE = new InGameState(renderer, false);
-    private static final ReplayGameState REPLAY_GAME_STATE = new ReplayGameState(renderer);
-    static GameState currentState;
+    private static final JFrame frame = new JFrame("Dice Wars");
+    private static final GameCreationScene GAME_CREATION_SCENE = new GameCreationScene(frame);
+    private static final InGameScene IN_GAME_SCENE = new InGameScene(frame);
+    private static final ReplayScene REPLAY_SCENE = new ReplayScene(frame);
+    static Scene currentState;
 
     public static void main(String[] args) {
-        JFrame frame = new JFrame("Dice Wars");
         frame.setSize(550, 250);
         frame.setVisible(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        frame.add(renderer);
-
-        switchState(GAME_CREATION_STATE);
+        switchState(GAME_CREATION_SCENE);
 
         timer = new Timer(10, new ActionListener() {
             @Override
@@ -40,9 +39,6 @@ public class DiceWars {
                 if (arg0.getSource() == timer) {
                     currentState.update();
                     currentState.render();
-
-                    renderer.revalidate();
-                    renderer.repaint();
                 }
             }
         });
@@ -50,8 +46,7 @@ public class DiceWars {
         timer.start();
     }
 
-    public static void startNewGame(Player[] players) {
-        IN_GAME_STATE.setPlayers(players);
+    public static void startNewGame(List<Player> players) {
         boolean aiOnly = true;
         for (Player p : players) {
             if (p instanceof HumanPlayer)
@@ -60,21 +55,26 @@ public class DiceWars {
                 break;
             }
         }
-        IN_GAME_STATE.setAiOnly(aiOnly);
-        IN_GAME_STATE.setMap(new GameMap(players));
-        switchState(IN_GAME_STATE);
+        IN_GAME_SCENE.setGameState(
+            new GameState(
+                players,
+                new GameMap(players),
+                aiOnly ? GameMode.GAME_MODE_AI_ONLY : GameMode.GAME_MODE_NORMAL
+            )
+        );
+        switchState(IN_GAME_SCENE);
+    }
+
+    public static void startReplay(GameState state) {
+        REPLAY_SCENE.setGameState(state);
+        switchState(REPLAY_SCENE);
     }
 
     public static void endGame() {
-        switchState(GAME_CREATION_STATE);
+        switchState(GAME_CREATION_SCENE);
     }
 
-    public static void startReplay(GameSave gs) {
-        REPLAY_GAME_STATE.setGameSave(gs);
-        switchState(REPLAY_GAME_STATE);
-    }
-
-    public static void switchState(GameState newState) {
+    public static void switchState(Scene newState) {
         if (currentState != null) currentState.shutdown();
         currentState = newState;
         currentState.startup();

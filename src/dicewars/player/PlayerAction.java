@@ -11,7 +11,6 @@ public class PlayerAction extends GameEvent {
     private Tile target;
     private boolean valid;
     private boolean endTurn;
-    private boolean executed = false;
     private int[] ownThrow = new int[9];
     private int[] opponentThrow = new int[9];
 
@@ -43,32 +42,16 @@ public class PlayerAction extends GameEvent {
         this.endTurn = endTurn;
     }
 
-    public PlayerAction(Tile attacker, Tile target, boolean valid, boolean endTurn, int[] ownThrow, int[] opponentThrow) {
-        this.attacker = attacker;
-        this.target = target;
-        this.valid = valid;
-        this.endTurn = endTurn;
-        this.executed = false;
-        for (int i = 0; i < 9; i++) this.ownThrow[i] = ownThrow[i];
-        for (int i = 0; i < 9; i++) this.opponentThrow[i] = opponentThrow[i];
-    }
-
-    public void execute() {
-        this.executed = true;
-        if (this.valid) {
-            int ownThrowSum = 0, opponentThrowSum = 0;
-            for (int i : this.ownThrow) {
-                ownThrowSum += i;
-            }
-            for (int i : this.opponentThrow) {
-                opponentThrowSum += i;
-            }
-            if (ownThrowSum > opponentThrowSum) {
-                target.setOwner(attacker.getOwner());
-                target.setDices(attacker.getDices() - 1);
-            }
-            attacker.setDices(1);
-        }
+    @Override
+    public GameEvent translateToMap(GameMap map) {
+        Tile tAttacker = map.getTile(attacker.X, attacker.Y);
+        Tile tTarget = map.getTile(target.X, target.Y);
+        if (tAttacker == null || tTarget == null) return null;
+        PlayerAction tAction = new PlayerAction(tAttacker, tTarget, endTurn);
+        tAction.valid = this.valid;
+        for (int i = 0; i < 9; i++) tAction.ownThrow[i] = this.ownThrow[i];
+        for (int i = 0; i < 9; i++) tAction.opponentThrow[i] = this.opponentThrow[i];
+        return tAction;
     }
 
     public boolean isActionOf(Player p) {
@@ -92,10 +75,6 @@ public class PlayerAction extends GameEvent {
         return endTurn;
     }
 
-    public boolean isExecuted() {
-        return executed;
-    }
-
     public int[] getOwnThrow() {
         return ownThrow;
     }
@@ -106,7 +85,7 @@ public class PlayerAction extends GameEvent {
 
     @Override
     public String toString() {
-        if (this.valid && this.executed) {
+        if (this.valid) {
             StringBuilder sb = new StringBuilder();
             sb.append("Own throw:");
             int sum = 0;

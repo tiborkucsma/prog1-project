@@ -2,6 +2,7 @@ package dicewars.rendering;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseEvent;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -24,4 +25,5 @@ public class Renderer extends JComponent {
             renderQueue.poll().render(g);
         }
     }
+
 }

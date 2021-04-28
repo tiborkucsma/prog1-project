@@ -13,7 +13,8 @@ public class DiceDistribution extends GameEvent {
         addedDices = new HashMap<>();
     }
 
-    public DiceDistribution translateToMap(GameMap map) {
+    @Override
+    public GameEvent translateToMap(GameMap map) {
         DiceDistribution tEvent = new DiceDistribution();
         for (Map.Entry<Tile, Integer> entry : addedDices.entrySet()) {
             Tile tTile = map.getTile(entry.getKey().X, entry.getKey().Y);
