@@ -15,6 +15,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This is basically the main menu of the game.
@@ -28,7 +29,7 @@ public class GameCreationScene implements Scene {
     private JButton startGameButton = new JButton("Start game");
     private JButton startReplayButton = new JButton("Play replay file");
     private String[] playerTypes = { "None", "Human", "Basic AI", "Offensive AI", "Defensive AI" };
-    private JComboBox<String>[] playerSelection = new JComboBox[5];
+    private List<JComboBox<String>> playerSelection = new ArrayList<>();
 
     /**
      * Inits the scene
@@ -38,16 +39,16 @@ public class GameCreationScene implements Scene {
         this.frame = frame;
         this.panel.add(startGameButton);
         this.panel.add(startReplayButton);
-        for (int i = 0; i < playerSelection.length; i++) {
-            playerSelection[i] = new JComboBox<>(playerTypes);
-            this.panel.add(playerSelection[i]);
+        for (int i = 0; i < 5; i++) {
+            playerSelection.add(new JComboBox<>(playerTypes));
+            this.panel.add(playerSelection.get(i));
         }
         startGameButton.addActionListener(l -> {
             ArrayList<Player> players = new ArrayList<>();
             int nSelected = 0;
-            for (int i = 0; i < playerSelection.length; i++) {
+            for (int i = 0; i < playerSelection.size(); i++) {
                 nSelected++;
-                switch (playerSelection[i].getSelectedIndex()) {
+                switch (playerSelection.get(i).getSelectedIndex()) {
                     case 1: players.add(new HumanPlayer(playerColors[i])); break;
                     case 2: players.add(new AIPlayerBasic(playerColors[i])); break;
                     case 3: players.add(new AIPlayerOffensive(playerColors[i])); break;

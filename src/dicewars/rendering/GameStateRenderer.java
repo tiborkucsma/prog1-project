@@ -6,10 +6,8 @@ import dicewars.player.HumanPlayer;
 import dicewars.player.Player;
 import dicewars.state.GameState;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 
 import java.util.List;
 

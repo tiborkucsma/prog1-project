@@ -17,7 +17,7 @@ public class AIPlayerDefensive extends AIPlayer {
         super(color);
     }
 
-    private int calculateEnemyPresence(List<Tile> tiles, int n) {
+    private int calculateDanger(List<Tile> tiles, int n) {
         int res = 0;
         for (Tile t : tiles) {
             if (t.getOwner() != this) res += (n - t.getDices()) / 8.0;
@@ -33,11 +33,11 @@ public class AIPlayerDefensive extends AIPlayer {
         for (Tile cOwn : tiles) {
             List<Tile> neighbours = gameMap.getNeighbours(cOwn);
             for (Tile cOpp : neighbours) {
-                if (cOpp.getOwner() != this && cOwn.getDices() > 3) {
+                if (cOpp.getOwner() != this && cOwn.getDices() > 1) {
                     double cScore =
                         cOwn.getDices() - cOpp.getDices() +
                         (cOwn.getDices() == 8 ? 0.5 : 0) -
-                        calculateEnemyPresence(gameMap.getNeighbours(cOwn), cOwn.getDices()) / 5.0;
+                        calculateDanger(gameMap.getNeighbours(cOwn), cOwn.getDices()) / 5.0;
                     if (cScore > bestOptionScore) {
                         bestOptionOwn = cOwn;
                         bestOptionOpp = cOpp;

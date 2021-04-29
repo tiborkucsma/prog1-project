@@ -2,7 +2,6 @@ package dicewars;
 
 import dicewars.player.HumanPlayer;
 import dicewars.player.Player;
-import dicewars.rendering.Renderer;
 import dicewars.scene.GameCreationScene;
 import dicewars.scene.InGameScene;
 import dicewars.scene.ReplayScene;
