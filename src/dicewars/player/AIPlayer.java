@@ -1,6 +1,7 @@
 package dicewars.player;
 
 import dicewars.map.GameMap;
+import dicewars.state.events.PlayerAction;
 
 import java.awt.*;
 

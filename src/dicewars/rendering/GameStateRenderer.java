@@ -1,7 +1,5 @@
 package dicewars.rendering;
 
-import javax.swing.JComponent;
-
 import dicewars.map.GameMap;
 import dicewars.map.Tile;
 import dicewars.player.HumanPlayer;
@@ -21,9 +19,11 @@ import java.util.List;
  */
 public class GameStateRenderer extends Renderer {
     private GameState gameState;
+    private Tile hoveredTile = null;
     private Tile prevSelectedTile = null;
     private Tile selectedTile = null;
     private static final Font ARIAL_FONT = new Font("Arial", Font.PLAIN, 18);
+    private static final Font ARIAL_FONT_SMALL = new Font("Arial", Font.PLAIN, 15);
     private String statusText = "";
 
     /**
@@ -42,6 +42,8 @@ public class GameStateRenderer extends Renderer {
         GameMap map = gameState.getMap();
         
         if (gameState != null) {
+            List<Player> players = gameState.getPlayers();
+
             if (selectedTile != null && selectedTile.getOwner() == gameState.getCurrentPlayer()) {
                 int screenX = 50 + selectedTile.X * 87 + (selectedTile.Y % 2 == 1 ? 43 : 0);
                 int screenY = 50 + selectedTile.Y * 76;
@@ -55,17 +57,37 @@ public class GameStateRenderer extends Renderer {
                     }
                 }
             }
+
+            Point mousePos = getMousePosition();
+            hoveredTile = null;
             
             for (int y = 0; y < map.ROWS; y++) {
                 for (int x = 0; x < map.COLUMNS; x++) {
-                    map.getTile(x, y).render(this);
+                    Tile tile = gameState.getMap().getTile(x, y);
+                    int screenX = 50 + x * 87 + (y % 2 == 1 ? 43 : 0);
+                    int screenY = 50 + y * 76;
+                    
+                    Hexagon h = new Hexagon(screenX, screenY, 50);
+                    
+                    if (mousePos != null && h.contains(mousePos)) hoveredTile = tile;
+                    
+                    if (!tile.neutral) {
+                        if (tile == hoveredTile)
+                            addToQueue(new RenderablePolygon(h, Color.GREEN));
+                        addToQueue(new RenderablePolygon(new Hexagon(screenX, screenY, 45), tile.getOwner().color));
+                    
+                        screenX -= 25;
+                        addToQueue(new RenderableText("D: " + tile.getDices(), screenX, screenY - 10, ARIAL_FONT, Color.BLACK));
+                        addToQueue(new RenderableText("P" + (players.indexOf(tile.getOwner()) + 1), screenX, screenY + 15, ARIAL_FONT_SMALL, Color.BLACK));
+                    } else {
+                        addToQueue(new RenderablePolygon(new Hexagon(screenX, screenY, 45), Color.LIGHT_GRAY));
+                    }
                 }
             }
 
             int screenX = 15;
             int screenY = 600;
     
-            List<Player> players = gameState.getPlayers();
             for (int i = 0; i < players.size(); i++) {
                 Player p = players.get(i);
                 screenX = 15;
@@ -133,15 +155,14 @@ public class GameStateRenderer extends Renderer {
      */
     @Override
     protected void processMouseEvent(MouseEvent e) {
-        Tile h = gameState.getMap().getHoveredTile();
         if (e.getID() == MouseEvent.MOUSE_CLICKED &&
             e.getButton() == MouseEvent.BUTTON1)
         {
             if (gameState.getCurrentPlayer() instanceof HumanPlayer &&
-                h != null)
+                hoveredTile != null)
             {
                 prevSelectedTile = selectedTile;
-                selectedTile = h;
+                selectedTile = hoveredTile;
             } else {
                 prevSelectedTile = selectedTile;
                 selectedTile = null;

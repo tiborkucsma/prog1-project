@@ -1,10 +1,11 @@
-package dicewars.player;
+package dicewars.state.events;
 
 import java.util.Random;
 
-import dicewars.GameEvent;
 import dicewars.map.GameMap;
 import dicewars.map.Tile;
+import dicewars.player.HumanPlayer;
+import dicewars.player.Player;
 
 /**
  * Describes the action of a player

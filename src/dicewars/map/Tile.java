@@ -3,14 +3,6 @@ package dicewars.map;
 import java.io.Serializable;
 
 import dicewars.player.Player;
-import dicewars.rendering.Hexagon;
-import dicewars.rendering.RenderablePolygon;
-import dicewars.rendering.RenderableText;
-import dicewars.rendering.Renderer;
-
-import java.awt.Color;
-import java.awt.Point;
-import java.awt.Font;
 
 /**
  * Describes a tile of a map
@@ -21,8 +13,6 @@ public class Tile implements Serializable {
     public boolean neutral = true;
     public final int X;
     public final int Y;
-    private boolean hovered = false;
-    private static final Font ARIAL_FONT = new Font("Arial", Font.PLAIN, 18);
 
     /**
      * Init object
@@ -92,35 +82,6 @@ public class Tile implements Serializable {
      */
     public void setOwner(Player owner) {
         if (!this.neutral && owner != null) this.owner = owner;
-    }
-
-    public boolean isHovered() {
-        return hovered;
-    }
-
-    /**
-     * Render this tile using the given renderer
-     * @param renderer Renderer
-     */
-    public void render(Renderer renderer) {
-        int screenX = 50 + X * 87 + (Y % 2 == 1 ? 43 : 0);
-        int screenY = 50 + Y * 76;
-        
-        Hexagon h = new Hexagon(screenX, screenY, 50);
-        Point p = renderer.getMousePosition();
-        if (p == null) this.hovered = false;
-        else this.hovered = h.contains(p);
-        
-        if (!neutral) {
-            if (this.hovered)
-                renderer.addToQueue(new RenderablePolygon(h, Color.GREEN));
-            renderer.addToQueue(new RenderablePolygon(new Hexagon(screenX, screenY, 45), owner.color));
-        
-            screenX -= 25;
-            renderer.addToQueue(new RenderableText("K: " + dices, screenX, screenY, ARIAL_FONT, Color.BLACK));
-        } else {
-            renderer.addToQueue(new RenderablePolygon(new Hexagon(screenX, screenY, 45), Color.LIGHT_GRAY));
-        }
     }
 
 }

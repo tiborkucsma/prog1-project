@@ -5,6 +5,7 @@ import java.util.List;
 
 import dicewars.map.GameMap;
 import dicewars.map.Tile;
+import dicewars.state.events.PlayerAction;
 
 /**
  * This is the defensive AI. It scores the tiles not only by the number of dices,

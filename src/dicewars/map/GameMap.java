@@ -1,24 +1,12 @@
 package dicewars.map;
 
-import dicewars.DiceDistribution;
 import dicewars.player.Player;
-import dicewars.rendering.Hexagon;
-import dicewars.rendering.RenderablePolygon;
-import dicewars.rendering.RenderableText;
-import dicewars.rendering.Renderer;
+import dicewars.state.events.DiceDistribution;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
-import javax.swing.JButton;
-
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.Point;
-import java.awt.Color;
-import java.awt.Font;
 
 /**
  * Describes the game map.
@@ -116,14 +104,6 @@ public class GameMap implements Serializable {
             if (countDices(tiles) == tiles.size() * 8) break; // stop the loop if all the tiles are full
         }
         return dd;
-    }
-
-    /**
-     *
-     * @return The internal 2d array storing the map
-     */
-    public Tile[][] getMap() {
-        return map;
     }
 
     /**
@@ -241,17 +221,6 @@ public class GameMap implements Serializable {
         if (isOddRow && inBounds(q - 1, r) && !map[q-1][r].neutral) n++;
         else if (!isOddRow && inBounds(q + 1, r) && !map[q+1][r].neutral) n++;
         return n;
-    }
-
-    public Tile getHoveredTile() {
-        for (int x = 0; x < COLUMNS; x++) {
-            for (int y = 0; y < ROWS; y++) {
-                if (map[x][y].isHovered()) {
-                    return map[x][y];
-                }
-            }
-        }
-        return null;
     }
 
     /**

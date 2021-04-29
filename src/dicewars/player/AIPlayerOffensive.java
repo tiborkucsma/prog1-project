@@ -6,6 +6,7 @@ import java.util.List;
 
 import dicewars.map.GameMap;
 import dicewars.map.Tile;
+import dicewars.state.events.PlayerAction;
 
 /**
  * This is the offensive AI. It only attacks if it has more than 3 dices on a tile

@@ -1,4 +1,4 @@
-package dicewars;
+package dicewars.state.events;
 
 import java.io.Serializable;
 

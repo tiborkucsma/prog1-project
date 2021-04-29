@@ -10,13 +10,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import dicewars.DiceDistribution;
-import dicewars.GameEvent;
 import dicewars.map.GameMap;
 import dicewars.map.Tile;
 import dicewars.player.HumanPlayer;
 import dicewars.player.Player;
-import dicewars.player.PlayerAction;
+import dicewars.state.events.DiceDistribution;
+import dicewars.state.events.GameEvent;
+import dicewars.state.events.PlayerAction;
 
 /**
  * Describes the state of a game (players, currentPlayer, map).

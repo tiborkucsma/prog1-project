@@ -1,23 +1,17 @@
 package dicewars.scene;
 
 import dicewars.DiceWars;
-import dicewars.GameEvent;
-import dicewars.player.AIPlayer;
-import dicewars.player.PlayerAction;
 import dicewars.rendering.GameStateRenderer;
 import dicewars.state.GameState;
 import dicewars.state.GameState.GameMode;
+import dicewars.state.events.GameEvent;
+import dicewars.state.events.PlayerAction;
 
 import javax.swing.*;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 
 /**
  * Scene for replay playback
@@ -25,13 +19,15 @@ import java.io.IOException;
 public class ReplayScene implements Scene {
     private final JFrame frame;
     private GameStateRenderer gameStateRenderer;
-    private static final Font ARIAL_FONT = new Font("Arial", Font.PLAIN, 20);
-    private boolean paused = false;
     private GameState gameState;
     private JButton quitButton = new JButton("Quit to menu");
-    private JButton stepButton = new JButton(">");
+    private JButton playButton = new JButton("Play");
+    private JButton pauseButton = new JButton("Pause");
+    private JButton stepButton = new JButton("Step one");
+    private JSlider speedControl = new JSlider();
     private JPanel panel = new JPanel();
-    private Timer replayStepTimer = new Timer(10, new ActionListener() {
+    private JPanel controlPanel = new JPanel();
+    private Timer replayStepTimer = new Timer(500, new ActionListener() {
         @Override
         public void actionPerformed(ActionEvent arg0) {
             step();
@@ -52,10 +48,29 @@ public class ReplayScene implements Scene {
         this.stepButton.addActionListener(l -> {
             step();
         });
-        this.panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
-        this.panel.add(quitButton);
-        this.panel.add(gameStateRenderer);
-        this.panel.add(stepButton);
+        this.playButton.addActionListener(l -> {
+            replayStepTimer.start();
+        });
+        this.pauseButton.addActionListener(l -> {
+            replayStepTimer.stop();
+        });
+        this.speedControl.setMaximumSize(new Dimension(200, 0));
+        this.speedControl.setMinimum(0);
+        this.speedControl.setMaximum(990);
+        this.speedControl.setValue(500);
+        this.speedControl.addChangeListener(l -> {
+            replayStepTimer.setDelay(1000 - ((JSlider) l.getSource()).getValue());
+        });
+        this.controlPanel.setLayout(new FlowLayout());
+        this.controlPanel.add(quitButton);
+        this.controlPanel.add(new JLabel("Playback speed:"));
+        this.controlPanel.add(speedControl);
+        this.controlPanel.add(playButton);
+        this.controlPanel.add(pauseButton);
+        this.controlPanel.add(stepButton);
+        this.panel.setLayout(new BorderLayout());
+        this.panel.add(controlPanel, BorderLayout.NORTH);
+        this.panel.add(gameStateRenderer, BorderLayout.CENTER);
     }
 
     /**
@@ -75,12 +90,16 @@ public class ReplayScene implements Scene {
      */
     public void step() {
         GameEvent event = gameState.stepForward();
+        if (event == null) {
+            replayStepTimer.stop();
+            JOptionPane.showMessageDialog(frame, "Replay file over!");
+        }
         if (event instanceof PlayerAction)
             gameStateRenderer.setStatusText(((PlayerAction) event).toString());
     }
 
     /**
-     * Empty the window and add this secene's panel and start the replay tick
+     * Empty the window and add this secene's panel
      */
     @Override
     public void startup() {
@@ -92,10 +111,6 @@ public class ReplayScene implements Scene {
 
         this.frame.revalidate();
         this.frame.repaint();
-
-        paused = false;
-
-        replayStepTimer.start();
     }
 
     /**

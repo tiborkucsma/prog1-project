@@ -4,13 +4,14 @@ import dicewars.DiceWars;
 import dicewars.map.Tile;
 import dicewars.player.AIPlayer;
 import dicewars.player.HumanPlayer;
-import dicewars.player.PlayerAction;
 import dicewars.rendering.GameStateRenderer;
 import dicewars.state.GameState;
 import dicewars.state.GameState.GameMode;
+import dicewars.state.events.PlayerAction;
 
 import javax.swing.*;
 
+import java.awt.*;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -35,6 +36,7 @@ public class InGameScene implements Scene, MouseListener {
     private JButton saveReplayButton = new JButton("Save replay");
     private JButton endTurnButton = new JButton("End turn");
     private JPanel panel = new JPanel();
+    private JPanel controlPanel = new JPanel();
     private JSlider speedControl = new JSlider();
     private Timer aiTimer = new Timer(500, new ActionListener() {
         @Override
@@ -91,12 +93,15 @@ public class InGameScene implements Scene, MouseListener {
         this.speedControl.addChangeListener(l -> {
             aiTimer.setDelay(1000 - ((JSlider) l.getSource()).getValue());
         });
+        this.controlPanel.setLayout(new FlowLayout());
+        this.controlPanel.add(quitButton);
+        this.controlPanel.add(saveReplayButton);
+        this.controlPanel.add(new JLabel("AI speed:"));
+        this.controlPanel.add(speedControl);
         this.panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
-        this.panel.add(quitButton);
-        this.panel.add(saveReplayButton);
-        this.panel.add(speedControl);
-        this.panel.add(gameStateRenderer);
-        this.panel.add(endTurnButton);
+        this.panel.add(controlPanel, BorderLayout.NORTH);
+        this.panel.add(gameStateRenderer, BorderLayout.CENTER);
+        this.panel.add(endTurnButton, BorderLayout.SOUTH);
     }
 
     /**

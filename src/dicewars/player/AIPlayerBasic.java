@@ -6,6 +6,7 @@ import java.util.List;
 
 import dicewars.map.GameMap;
 import dicewars.map.Tile;
+import dicewars.state.events.PlayerAction;
 
 /**
  * This is the most basic AI opponent. It always attacks if it can, and always selects the first valid move.
