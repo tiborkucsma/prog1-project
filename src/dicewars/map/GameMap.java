@@ -20,11 +20,18 @@ import java.awt.Point;
 import java.awt.Color;
 import java.awt.Font;
 
+/**
+ * Describes the game map.
+ */
 public class GameMap implements Serializable {
     private final Tile[][] map;
     public final int COLUMNS;
     public final int ROWS;
 
+    /**
+     * Generate a new map for the given players
+     * @param players players
+     */
     public GameMap(List<Player> players) {
         int tilePerPlayer = 12;
         ROWS = (int) Math.ceil(Math.sqrt(((tilePerPlayer + 6) / 2) * players.size()));
@@ -64,6 +71,10 @@ public class GameMap implements Serializable {
         }
     }
 
+    /**
+     * Create a copy of a map.
+     * @param gameMap Map to copy
+     */
     public GameMap(GameMap gameMap) {
         this.COLUMNS = gameMap.COLUMNS;
         this.ROWS = gameMap.ROWS;
@@ -73,6 +84,11 @@ public class GameMap implements Serializable {
                 this.map[x][y] = new Tile(gameMap.map[x][y]);
     }
 
+    /**
+     * Counts the dices on a set of tiles
+     * @param tiles Target tiles
+     * @return count of dices
+     */
     public int countDices(List<Tile> tiles) {
         if (tiles == null) return 0;
         int res = 0;
@@ -102,10 +118,20 @@ public class GameMap implements Serializable {
         return dd;
     }
 
+    /**
+     *
+     * @return The internal 2d array storing the map
+     */
     public Tile[][] getMap() {
         return map;
     }
 
+    /**
+     * Checks if a coordinate is in the bounds of this map.
+     * @param q x coordinate
+     * @param r y coordinate
+     * @return true if the map contains the coordinate false otherwise
+     */
     public boolean inBounds(int q, int r) {
         return  r >= 0 &&
                 q >= 0 &&
@@ -113,10 +139,21 @@ public class GameMap implements Serializable {
                 q < COLUMNS;
     }
 
+    /**
+     * Get a tile with the given coords
+     * @param q x coordinate
+     * @param r y coordinate
+     * @return the tile or null if coords are outside the map
+     */
     public Tile getTile(int q, int r) {
         return inBounds(q, r) ? map[q][r] : null;
     }
 
+    /**
+     * Get the tiles of a given player
+     * @param owner The player
+     * @return A list of their tiles
+     */
     public ArrayList<Tile> getTiles(Player owner) {
         ArrayList<Tile> res = new ArrayList<>();
         for (int x = 0; x < COLUMNS; x++) {
@@ -129,6 +166,12 @@ public class GameMap implements Serializable {
         return res;
     }
 
+    /**
+     * Check if two tiles are adjacent
+     * @param t1 tile 1
+     * @param t2 tile 2
+     * @return true if they are adjacent false otherwise
+     */
     public static boolean adjacent(Tile t1, Tile t2) {
         if (Math.abs(t1.X - t2.X) <= 1 && Math.abs(t1.Y - t2.Y) <= 1) {
             if (t1.Y % 2 == 1)
@@ -139,10 +182,21 @@ public class GameMap implements Serializable {
         return false;
     }
 
+    /**
+     * Get the neighbours of a tile
+     * @param t tile
+     * @return List of neighbours
+     */
     public ArrayList<Tile> getNeighbours(Tile t) {
         return getNeighbours(t.X, t.Y);
     }
 
+    /**
+     * Get the neighbours of a tile
+     * @param q x coord of tile
+     * @param r y coord of tile
+     * @return List of neighbours
+     */
     public ArrayList<Tile> getNeighbours(int q, int r) {
         ArrayList<Tile> res = new ArrayList<>();
         boolean isOddRow = r % 2 == 1;
@@ -163,6 +217,12 @@ public class GameMap implements Serializable {
         return res;
     }
 
+    /**
+     * Count the neighbours of a tile
+     * @param q x coord of tile
+     * @param r y coord of tile
+     * @return count of neighbours
+     */
     public int noOfNeighbours(int q, int r) {
         int n = 0;
         boolean isOddRow = r % 2 == 1;
@@ -194,6 +254,10 @@ public class GameMap implements Serializable {
         return null;
     }
 
+    /**
+     * Generate string image of map (only used for development)
+     * @return Generated string
+     */
     @Override
     public String toString() {
         StringBuilder res = new StringBuilder();

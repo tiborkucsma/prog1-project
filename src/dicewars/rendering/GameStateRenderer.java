@@ -26,10 +26,17 @@ public class GameStateRenderer extends Renderer {
     private static final Font ARIAL_FONT = new Font("Arial", Font.PLAIN, 18);
     private String statusText = "";
 
+    /**
+     * Default constructor
+     */
     public GameStateRenderer() {
         super();
     }
 
+    /**
+     * Renders the game state
+     * @param g Graphics
+     */
     @Override
     protected void paintComponent(Graphics g) {
         GameMap map = gameState.getMap();
@@ -77,14 +84,26 @@ public class GameStateRenderer extends Renderer {
         super.paintComponent(g);
     }
 
+    /**
+     * Sets the status text (appears in lower left corner in game)
+     * @param statusText text
+     */
     public void setStatusText(String statusText) {
         this.statusText = statusText;
     }
 
+    /**
+     *
+     * @return Current selected tile
+     */
     public Tile getSelectedTile() {
         return selectedTile;
     }
 
+    /**
+     *
+     * @return Previous selected tile
+     */
     public Tile getPrevSelectedTile() {
         return prevSelectedTile;
     }
@@ -94,6 +113,10 @@ public class GameStateRenderer extends Renderer {
         this.statusText = "";
     }
 
+    /**
+     *
+     * @return Calculate needed screen space
+     */
     @Override
     public Dimension getPreferredSize() {
         if (gameState != null) {
@@ -104,6 +127,10 @@ public class GameStateRenderer extends Renderer {
         return super.getPreferredSize();
     }
 
+    /**
+     * Update the current and previous selected tile, then pass on the event
+     * @param e Event
+     */
     @Override
     protected void processMouseEvent(MouseEvent e) {
         Tile h = gameState.getMap().getHoveredTile();

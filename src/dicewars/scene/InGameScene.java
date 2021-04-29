@@ -22,6 +22,10 @@ import java.io.IOException;
 
 import javax.swing.JFileChooser;
 
+/**
+ * This is the Scene used in-game.
+ * The glue between the game state and I/O (rendering and user input)
+ */
 public class InGameScene implements Scene, MouseListener {
     private final JFrame frame;
     private GameStateRenderer gameStateRenderer;
@@ -48,6 +52,10 @@ public class InGameScene implements Scene, MouseListener {
         }
     });
 
+    /**
+     * Inits the scene
+     * @param frame Window to use
+     */
     public InGameScene(JFrame frame) {
         this.frame = frame;
         this.gameStateRenderer = new GameStateRenderer();
@@ -91,6 +99,9 @@ public class InGameScene implements Scene, MouseListener {
         this.panel.add(endTurnButton);
     }
 
+    /**
+     * Empty the window and add this secene's panel and start the ai tick
+     */
     @Override
     public void startup() {
         this.frame.getContentPane().removeAll();
@@ -107,6 +118,9 @@ public class InGameScene implements Scene, MouseListener {
         aiTimer.start();
     }
 
+    /**
+     * Empty the window and stop the ai tick
+     */
     @Override
     public void shutdown() {
         aiTimer.stop();
@@ -115,10 +129,17 @@ public class InGameScene implements Scene, MouseListener {
         this.frame.repaint();
     }
 
+    /**
+     *
+     * @param gameState The new game state to load
+     */
     public void setGameState(GameState gameState) {
         this.gameState = gameState;
     }
 
+    /**
+     * End the current turn. Also handles the end of game.
+     */
     private void endTurn() {
         gameState.endTurn();
         int playersAlive = gameState.countPlayersAlive();
@@ -142,16 +163,19 @@ public class InGameScene implements Scene, MouseListener {
         }
     }
 
-    @Override
-    public void update() {
-    }
-
+    /**
+     * Redraw the game
+     */
     @Override
     public void render() {
         gameStateRenderer.revalidate();
         gameStateRenderer.repaint();
     }
 
+    /**
+     * Process user mouse input
+     * @param e Mouse event
+     */
     @Override
     public void mouseClicked(MouseEvent e) {
         if (e.getID() == MouseEvent.MOUSE_CLICKED && e.getButton() == MouseEvent.BUTTON1) {

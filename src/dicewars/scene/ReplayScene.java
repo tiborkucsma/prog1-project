@@ -19,6 +19,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+/**
+ * Scene for replay playback
+ */
 public class ReplayScene implements Scene {
     private final JFrame frame;
     private GameStateRenderer gameStateRenderer;
@@ -35,6 +38,10 @@ public class ReplayScene implements Scene {
         }
     });
 
+    /**
+     * Inits the scene
+     * @param frame Window to use
+     */
     public ReplayScene(JFrame frame) {
         this.frame = frame;
         this.gameStateRenderer = new GameStateRenderer();
@@ -51,6 +58,10 @@ public class ReplayScene implements Scene {
         this.panel.add(stepButton);
     }
 
+    /**
+     *
+     * @param gameState The new game state to load
+     */
     public void setGameState(GameState gameState) {
         if (gameState.getMode() == GameMode.GAME_MODE_REPLAY) {
             this.gameState = gameState;
@@ -59,12 +70,18 @@ public class ReplayScene implements Scene {
         }
     }
 
+    /**
+     * Steps the playback forward
+     */
     public void step() {
         GameEvent event = gameState.stepForward();
         if (event instanceof PlayerAction)
             gameStateRenderer.setStatusText(((PlayerAction) event).toString());
     }
 
+    /**
+     * Empty the window and add this secene's panel and start the replay tick
+     */
     @Override
     public void startup() {
         this.frame.getContentPane().removeAll();
@@ -81,6 +98,9 @@ public class ReplayScene implements Scene {
         replayStepTimer.start();
     }
 
+    /**
+     * Empty the window and stop the replay tick
+     */
     @Override
     public void shutdown() {
         replayStepTimer.stop();
@@ -89,11 +109,9 @@ public class ReplayScene implements Scene {
         this.frame.repaint();
     }
 
-    @Override
-    public void update() {
-        
-    }
-
+    /**
+     * Redraw the game
+     */
     @Override
     public void render() {
         gameStateRenderer.revalidate();

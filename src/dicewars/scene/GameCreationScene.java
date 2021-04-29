@@ -1,10 +1,9 @@
 package dicewars.scene;
 
 import dicewars.DiceWars;
-import dicewars.GameSave;
-import dicewars.player.AIPlayerEasy;
-import dicewars.player.AIPlayerHard;
-import dicewars.player.AIPlayerMedium;
+import dicewars.player.AIPlayerBasic;
+import dicewars.player.AIPlayerOffensive;
+import dicewars.player.AIPlayerDefensive;
 import dicewars.player.HumanPlayer;
 import dicewars.player.Player;
 import dicewars.state.GameState;
@@ -18,15 +17,24 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 
+/**
+ * This is basically the main menu of the game.
+ * You can either create a new game from this scene,
+ * or load a replay.
+ */
 public class GameCreationScene implements Scene {
     private final JFrame frame;
     private final Color[] playerColors = { Color.CYAN, Color.YELLOW, Color.ORANGE, Color.RED, Color.MAGENTA };
     private JPanel panel = new JPanel();
     private JButton startGameButton = new JButton("Start game");
     private JButton startReplayButton = new JButton("Play replay file");
-    private String[] playerTypes = { "None", "Human", "AI Easy", "AI Medium", "AI Hard" };
+    private String[] playerTypes = { "None", "Human", "Basic AI", "Offensive AI", "Defensive AI" };
     private JComboBox<String>[] playerSelection = new JComboBox[5];
 
+    /**
+     * Inits the scene
+     * @param frame Window to use
+     */
     public GameCreationScene(JFrame frame) {
         this.frame = frame;
         this.panel.add(startGameButton);
@@ -37,16 +45,19 @@ public class GameCreationScene implements Scene {
         }
         startGameButton.addActionListener(l -> {
             ArrayList<Player> players = new ArrayList<>();
+            int nSelected = 0;
             for (int i = 0; i < playerSelection.length; i++) {
+                nSelected++;
                 switch (playerSelection[i].getSelectedIndex()) {
                     case 1: players.add(new HumanPlayer(playerColors[i])); break;
-                    case 2: players.add(new AIPlayerEasy(playerColors[i])); break;
-                    case 3: players.add(new AIPlayerMedium(playerColors[i])); break;
-                    case 4: players.add(new AIPlayerHard(playerColors[i])); break;
-                    default:
+                    case 2: players.add(new AIPlayerBasic(playerColors[i])); break;
+                    case 3: players.add(new AIPlayerOffensive(playerColors[i])); break;
+                    case 4: players.add(new AIPlayerDefensive(playerColors[i])); break;
+                    default: nSelected--;
                 }
             }
-            dicewars.DiceWars.startNewGame(players);
+            if (nSelected < 2) JOptionPane.showMessageDialog(frame, "Please select at least 2 players!");
+            else dicewars.DiceWars.startNewGame(players);
         });
         startReplayButton.addActionListener(l -> {
             JFileChooser fc = new JFileChooser();
@@ -72,6 +83,9 @@ public class GameCreationScene implements Scene {
         });
     }
 
+    /**
+     * Empty the window and add this secene's panel
+     */
     @Override
     public void startup() {
         this.frame.getContentPane().removeAll();
@@ -82,16 +96,15 @@ public class GameCreationScene implements Scene {
         this.frame.repaint();
     }
 
+    /**
+     * Empty the window
+     */
     @Override
     public void shutdown() {
         this.frame.getContentPane().removeAll();
 
         this.frame.revalidate();
         this.frame.repaint();
-    }
-
-    @Override
-    public void update() {
     }
 
     @Override

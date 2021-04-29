@@ -12,6 +12,9 @@ import java.awt.Color;
 import java.awt.Point;
 import java.awt.Font;
 
+/**
+ * Describes a tile of a map
+ */
 public class Tile implements Serializable {
     private Player owner = null;
     private int dices = 1;
@@ -21,11 +24,20 @@ public class Tile implements Serializable {
     private boolean hovered = false;
     private static final Font ARIAL_FONT = new Font("Arial", Font.PLAIN, 18);
 
+    /**
+     * Init object
+     * @param x x coordinate
+     * @param y y coordinate
+     */
     public Tile(int x, int y) {
         this.X = x;
         this.Y = y;
     }
 
+    /**
+     * Create copy of tile
+     * @param t Tile to copy
+     */
     public Tile(Tile t) {
         this.X = t.X;
         this.Y = t.Y;
@@ -34,6 +46,10 @@ public class Tile implements Serializable {
         this.owner = t.owner;
     }
 
+    /**
+     * Set the number of dices on this tile
+     * @param dices new number of dices
+     */
     public void setDices(int dices) {
         if (dices >= 1 && dices <= 8) {
             this.dices = dices;
@@ -42,6 +58,10 @@ public class Tile implements Serializable {
         }
     }
 
+    /**
+     * Increment the number of dices by 1
+     * @return How much the number of dices was actually incremented by (0 or 1)
+     */
     public int incDices() {
         if (dices < 8) {
             dices++;
@@ -50,14 +70,26 @@ public class Tile implements Serializable {
         return 0;
     }
 
+    /**
+     * Get the number of dices
+     * @return Number of dices
+     */
     public int getDices() {
         return dices;
     }
 
+    /**
+     * Get the owner
+     * @return owner
+     */
     public Player getOwner() {
         return owner;
     }
 
+    /**
+     * Set the owner
+     * @param owner New owner
+     */
     public void setOwner(Player owner) {
         if (!this.neutral && owner != null) this.owner = owner;
     }
@@ -66,6 +98,10 @@ public class Tile implements Serializable {
         return hovered;
     }
 
+    /**
+     * Render this tile using the given renderer
+     * @param renderer Renderer
+     */
     public void render(Renderer renderer) {
         int screenX = 50 + X * 87 + (Y % 2 == 1 ? 43 : 0);
         int screenY = 50 + Y * 76;

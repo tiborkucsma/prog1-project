@@ -2,7 +2,16 @@ package dicewars.rendering;
 
 import java.awt.*;
 
+/**
+ * Special polygon with 6 vertices
+ */
 public class Hexagon extends Polygon {
+    /**
+     * Generates the geometry based on the radius and position
+     * @param px X position
+     * @param py Y position
+     * @param r radius
+     */
     public Hexagon(int px, int py, int r)
     {
         super();

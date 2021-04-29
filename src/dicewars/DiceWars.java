@@ -18,6 +18,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 
+/**
+ * The main game class. It is responsible for setting up and running the game.
+ */
 public class DiceWars {
     private static Timer timer;
     private static final JFrame frame = new JFrame("Dice Wars");
@@ -26,8 +29,12 @@ public class DiceWars {
     private static final ReplayScene REPLAY_SCENE = new ReplayScene(frame);
     static Scene currentState;
 
+    /**
+     * The main function of the game.
+     * @param args Cmd args
+     */
     public static void main(String[] args) {
-        frame.setSize(550, 250);
+        frame.setSize(1600, 900);
         frame.setVisible(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -37,7 +44,6 @@ public class DiceWars {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 if (arg0.getSource() == timer) {
-                    currentState.update();
                     currentState.render();
                 }
             }
@@ -46,6 +52,10 @@ public class DiceWars {
         timer.start();
     }
 
+    /**
+     * Starts a new game with the given players.
+     * @param players Players
+     */
     public static void startNewGame(List<Player> players) {
         boolean aiOnly = true;
         for (Player p : players) {
@@ -65,15 +75,26 @@ public class DiceWars {
         switchState(IN_GAME_SCENE);
     }
 
+    /**
+     * Starts a replay with a given state (loaded from a file by GameCreationState)
+     * @param state The GameState
+     */
     public static void startReplay(GameState state) {
         REPLAY_SCENE.setGameState(state);
         switchState(REPLAY_SCENE);
     }
 
+    /**
+     * Ends a game or replay
+     */
     public static void endGame() {
         switchState(GAME_CREATION_SCENE);
     }
 
+    /**
+     * Switches the current state. Shuts down the last state if there was any.
+     * @param newState State to switch to
+     */
     public static void switchState(Scene newState) {
         if (currentState != null) currentState.shutdown();
         currentState = newState;
