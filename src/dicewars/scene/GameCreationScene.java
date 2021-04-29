@@ -108,6 +108,10 @@ public class GameCreationScene implements Scene {
     }
 
     @Override
+    public void update() {
+    }
+
+    @Override
     public void render() {
     }
 }

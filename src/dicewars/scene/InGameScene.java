@@ -77,9 +77,7 @@ public class InGameScene implements Scene, MouseListener {
                 File file = fc.getSelectedFile();
                 try {
                     gameState.saveReplay(file);
-                } catch (FileNotFoundException e) {
-                    JOptionPane.showMessageDialog(frame, "Failed to save replay!");
-                    e.printStackTrace();
+                    JOptionPane.showMessageDialog(frame, "Replay saved successfully");
                 } catch (IOException e) {
                     JOptionPane.showMessageDialog(frame, "Failed to save replay!");
                     e.printStackTrace();
@@ -147,12 +145,39 @@ public class InGameScene implements Scene, MouseListener {
      */
     private void endTurn() {
         gameState.endTurn();
+        
+    }
+
+    @Override
+    public void update() {
         int playersAlive = gameState.countPlayersAlive();
         int humanPlayersAlive = gameState.countHumanPlayersAlive();
-        if (gameState.getMode() == GameMode.GAME_MODE_NORMAL && humanPlayersAlive == 0) {
+        if (playersAlive == 1) {
+            paused = true;
+            String[] options = { "Save game", "Quit" };
+            int x = JOptionPane.showOptionDialog(frame, "Game over.",
+                    "Info",
+                    JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+            if (x == 0) {
+                JFileChooser fc = new JFileChooser();
+                fc.setCurrentDirectory(new File(System.getProperty("user.dir")));
+                int option = fc.showSaveDialog(null);
+                if (option == JFileChooser.APPROVE_OPTION) {
+                    File file = fc.getSelectedFile();
+                    try {
+                        gameState.saveReplay(file);
+                        JOptionPane.showMessageDialog(frame, "Replay saved successfully");
+                    } catch (IOException e) {
+                        JOptionPane.showMessageDialog(frame, "Failed to save replay!");
+                        e.printStackTrace();
+                    }
+                }
+            }
+            DiceWars.endGame();
+        } else if (gameState.getMode() == GameMode.GAME_MODE_NORMAL && humanPlayersAlive == 0) {
             gameState.setMode(GameMode.GAME_MODE_AI_ONLY);
             paused = true;
-            String[] options = { "Watch AI players finish...", "End game." };
+            String[] options = { "Watch AI players finish...", "End game" };
             int x = JOptionPane.showOptionDialog(frame, "No human players left alive.",
                     "Info",
                     JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
@@ -161,10 +186,6 @@ public class InGameScene implements Scene, MouseListener {
             } else {
                 DiceWars.endGame();
             }
-        }
-        if (playersAlive == 1) {
-            paused = true;
-            JOptionPane.showMessageDialog(frame, "Game over.");
         }
     }
 

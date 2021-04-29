@@ -124,6 +124,10 @@ public class ReplayScene implements Scene {
         this.frame.repaint();
     }
 
+    @Override
+    public void update() {
+    }
+
     /**
      * Redraw the game
      */

@@ -45,6 +45,7 @@ public class DiceWars {
             public void actionPerformed(ActionEvent arg0) {
                 if (arg0.getSource() == timer) {
                     currentState.render();
+                    currentState.update();
                 }
             }
         });

@@ -1,7 +1,7 @@
 package dicewars.scene;
 
 /**
- * Scenes implement the different guis and gameplay I/O
+ * Scenes represent the different guis and handle gameplay I/O
  */
 public interface Scene {
     /**
@@ -13,6 +13,11 @@ public interface Scene {
      * Called every time this Scene replaced by an other one.
      */
     void shutdown();
+
+    /**
+     * Called every 10 milliseconds when this scene is shown.
+     */
+    void update();
 
     /**
      * Called every 10 milliseconds when this scene is shown.
