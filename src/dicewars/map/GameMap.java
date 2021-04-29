@@ -21,7 +21,7 @@ public class GameMap implements Serializable {
      * @param players players
      */
     public GameMap(List<Player> players) {
-        int tilePerPlayer = 12;
+        int tilePerPlayer = 6;
         ROWS = (int) Math.ceil(Math.sqrt(((tilePerPlayer + 6) / 2) * players.size()));
         COLUMNS = 2 * ROWS;
         map = new Tile[COLUMNS][ROWS];

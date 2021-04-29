@@ -37,7 +37,7 @@ public class AIPlayerOffensive extends AIPlayer {
                 }
             }
         }
-        if (bestOptionOwn != null && bestOptionOpp != null)
+        if (bestOptionScore > 0)
             return new PlayerAction(bestOptionOwn, bestOptionOpp, false);
         return new PlayerAction(null, null, true);
     }

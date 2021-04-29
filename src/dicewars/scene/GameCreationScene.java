@@ -12,7 +12,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
@@ -69,15 +68,8 @@ public class GameCreationScene implements Scene {
                     GameState gs = null;
                     gs = (GameState) ois.readObject();
                     DiceWars.startReplay(gs);
-                } catch (FileNotFoundException e) {
-                    JOptionPane.showMessageDialog(frame, "Failed to load replay file, file not found!");
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    JOptionPane.showMessageDialog(frame, "Failed to load replay file, IO exception!");
-                    e.printStackTrace();
-                } catch (ClassNotFoundException e) {
-                    JOptionPane.showMessageDialog(frame, "Failed to load replay file, class not found!");
-                    e.printStackTrace();
+                } catch (IOException|ClassNotFoundException e) {
+                    JOptionPane.showMessageDialog(frame, "Failed to load replay file!");
                 }
             }
         });

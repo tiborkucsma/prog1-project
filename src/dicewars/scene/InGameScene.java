@@ -18,7 +18,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import javax.swing.JFileChooser;
@@ -45,7 +44,7 @@ public class InGameScene implements Scene, MouseListener {
                 AIPlayer player = (AIPlayer) gameState.getCurrentPlayer();
                 PlayerAction pa = player.tick(gameState.getMap());
                 if (pa.isEndTurn()) {
-                    endTurn();
+                    gameState.endTurn();
                 } else {
                     gameState.execute(pa);
                 }
@@ -67,7 +66,7 @@ public class InGameScene implements Scene, MouseListener {
             DiceWars.endGame();
         });
         this.endTurnButton.addActionListener(l -> {
-            if (gameState.getCurrentPlayer() instanceof HumanPlayer) endTurn();
+            if (gameState.getCurrentPlayer() instanceof HumanPlayer) gameState.endTurn();
         });
         this.saveReplayButton.addActionListener(l -> {
             JFileChooser fc = new JFileChooser();
@@ -80,7 +79,6 @@ public class InGameScene implements Scene, MouseListener {
                     JOptionPane.showMessageDialog(frame, "Replay saved successfully");
                 } catch (IOException e) {
                     JOptionPane.showMessageDialog(frame, "Failed to save replay!");
-                    e.printStackTrace();
                 }
             }
         });
@@ -140,14 +138,6 @@ public class InGameScene implements Scene, MouseListener {
         this.gameState = gameState;
     }
 
-    /**
-     * End the current turn. Also handles the end of game.
-     */
-    private void endTurn() {
-        gameState.endTurn();
-        
-    }
-
     @Override
     public void update() {
         int playersAlive = gameState.countPlayersAlive();
@@ -169,7 +159,6 @@ public class InGameScene implements Scene, MouseListener {
                         JOptionPane.showMessageDialog(frame, "Replay saved successfully");
                     } catch (IOException e) {
                         JOptionPane.showMessageDialog(frame, "Failed to save replay!");
-                        e.printStackTrace();
                     }
                 }
             }
